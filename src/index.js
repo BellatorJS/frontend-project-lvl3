@@ -1,1 +1,2 @@
-console.log('Hello World!!!');
+import 'bootstrap';
+import './scss/_custom.scss';
