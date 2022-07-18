@@ -1,7 +1,10 @@
 import 'bootstrap';
 import './scss/_custom.scss';
 import * as yup from 'yup';
+import i18next from 'i18next';
+import { setLocale } from 'yup';
 import foo from './view.js';
+import runI18 from './locales/locales.js';
 
 const state = {
   urlLinks: [],
@@ -9,6 +12,7 @@ const state = {
 };
 
 const watchedState = foo(state);
+const i18nextInstance1 = runI18();
 
 const form = document.querySelector('.rss-form');
 
@@ -17,20 +21,26 @@ form.addEventListener('submit', (e) => {
   const formData = new FormData(e.target);
   const formUrlValue = formData.get('url');
   const formDates = Object.fromEntries(formData);
+  setLocale({
+    string: {
+      url: i18nextInstance1.t('errorURL'),
+    },
+    mixed: {
+      notOneOf: i18nextInstance1.t('errorRepeat'),
+    },
+  });
+
   const schema = yup.object().shape({
     url: yup.string().url().notOneOf(state.urlLinks),
   });
+
   schema.validate(formDates)
     .then(() => {
       watchedState.urlLinks.push(formUrlValue);
-      /* const inputform = form.elements[0];
-      inputform.value = '';
-      inputform.focus(); */
     })
     .catch((err) => {
-      const error = err.errors[0].slice(0, 23);
+      const [error] = err.errors;
       watchedState.errors.push(error);
     });
   state.errors = [];
 });
-console.log(state);
