@@ -3,6 +3,7 @@ import onChange from 'on-change';
 import * as yup from 'yup';
 import i18n from 'i18next';
 import runI18 from './locales/locales.js';
+import parsing from './parsing.js';
 
 const foo = (state) => {
   const feedback = document.querySelector('.feedback');
@@ -30,9 +31,12 @@ const foo = (state) => {
     console.log(value);
     switch (path) {
       case 'urlLinks':
+        const [value1] = value;
+        parsing(value1);
         renderLinks();
         break;
       case 'errors':
+
         renderErrors();
         break;
       default:
