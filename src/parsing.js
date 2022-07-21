@@ -8,8 +8,8 @@ const parsingHtml = (datas) => {
 const parsing = (rssLink) => {
   const instance = axios.create();
   instance.defaults.timeout = 2500;
-  const result = instance.get(rssLink)
-    .then((response) => response.data)
+  const result = instance.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${rssLink}`)
+    .then((response) => response.data.contents)
     .then((response1) => parsingHtml(response1))
     .then((data) => (data))
     .catch(() => console.log('!!!!'));
