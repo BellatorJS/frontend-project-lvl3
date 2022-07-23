@@ -1,7 +1,5 @@
 // BEGIN
 import onChange from 'on-change';
-import * as yup from 'yup';
-import i18n from 'i18next';
 import uniqueId from 'lodash/uniqueId.js';
 import runI18 from './locales/locales.js';
 import parsing from './parsing.js';
@@ -28,9 +26,8 @@ const foo = (state) => {
     inputform.value = '';
     inputform.focus();
   };
-
-  const renderPosts = (posts) => {
-    /* const cardPosts = document.createElement('div');
+  const renderPostsContainer = () => {
+    const cardPosts = document.createElement('div');
     cardPosts.className = 'card border-0';
     cardPosts.setAttribute('id', 'cardPosts');
     const cardBody = document.createElement('div');
@@ -39,9 +36,27 @@ const foo = (state) => {
     postName.className = 'card-title m4';
     postName.textContent = 'Посты';
     cardPosts.append(cardBody);
-    cardBody.append(postName);//!!!!!!!!!!!!!!!!!!!!!//
+    cardBody.append(postName);
     const postsEl = document.querySelector('.posts');
-    postsEl.append(cardPosts); */
+    postsEl.append(cardPosts);
+  };
+
+  const renderFeedsConstainer = () => {
+    const cardFeeds = document.createElement('div');
+    cardFeeds.setAttribute('id', 'cardFeeds');
+    cardFeeds.className = 'card border-0';
+    const cardBodyFeed = document.createElement('div');
+    cardBodyFeed.className = 'card-body';
+    const feedName = document.createElement('h2');
+    feedName.className = 'card-title h4';
+    feedName.textContent = 'Фиды';
+    cardFeeds.append(cardBodyFeed);
+    cardBodyFeed.append(feedName);
+    const feedsEl = document.querySelector('.feeds');
+    feedsEl.append(cardFeeds);
+  };
+
+  const renderPosts = (posts) => {
     posts.map((post) => {
       const cardPosts = document.getElementById('cardPosts');
       const ul = document.createElement('ul');
@@ -68,35 +83,10 @@ const foo = (state) => {
       cardPosts.append(ul);
     });
   };
-  const renderRSS = (promise) => {
-    if (state) { renderLinks(); }
-    console.log(promise);
+  const renderFeeds = (promise) => {
     const feedDescription = promise.querySelector('description').textContent;
     const feedTitle = promise.querySelector('title').textContent;
-    console.log(feedTitle, feedDescription);
-    const items = Array.from(promise.querySelectorAll('item'));
-    const posts = items.map((item) => {
-      const id = uniqueId();
-      const title = item.querySelector('title').textContent;
-      const link = item.querySelector('link').textContent;
-      const description = item.querySelector('description').textContent;
-      return {
-        'data-id': id,
-        href: link,
-        title,
-        description,
-      };
-    });
-    renderPosts(posts);
-    const cardFeeds = document.createElement('div');//! !!!!!!!!!!!!!!!!!!!!//
-    cardFeeds.className = 'card border-0';
-    const cardBodyFeed = document.createElement('div');
-    cardBodyFeed.className = 'card-body';
-    const feedName = document.createElement('h2');
-    feedName.className = 'card-title h4';
-    feedName.textContent = 'Фиды';
-    cardFeeds.append(cardBodyFeed);
-    cardBodyFeed.append(feedName);//! !!!!!!!!!!!!!!!!!!!!!!!//
+    const cardFeeds = document.getElementById('cardFeeds');
     const feeds1 = document.querySelector('.feeds');
     const ulFeeds = document.createElement('ul');
     ulFeeds.className = 'list-group border-0 rounded-0';
@@ -112,6 +102,25 @@ const foo = (state) => {
     listFeed.append(feedsDescription);
     ulFeeds.append(listFeed);
     cardFeeds.append(ulFeeds);
+    feeds1.append(cardFeeds);
+  };
+  const renderRSS = (promise) => {
+    if (state) { renderLinks(); }
+    const items = Array.from(promise.querySelectorAll('item'));
+    const posts = items.map((item) => {
+      const id = uniqueId();
+      const title = item.querySelector('title').textContent;
+      const link = item.querySelector('link').textContent;
+      const description = item.querySelector('description').textContent;
+      return {
+        'data-id': id,
+        href: link,
+        title,
+        description,
+      };
+    });
+    renderPosts(posts);
+
     const ul = document.createElement('ul');
     ul.className = 'list-group border-0 rounded-0';
     const li = document.createElement('li');
@@ -122,28 +131,19 @@ const foo = (state) => {
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.className = 'btn btn-outline-primary btn-sm';
-    feeds1.append(cardFeeds);
   };
 
   const watchedState = onChange(state, (path, value) => {
+    console.log(state);
     switch (path) {
       case 'urlLinks':
-        if (state.urlLinks.length == 1) {
-          const cardPosts = document.createElement('div');
-          cardPosts.className = 'card border-0';
-          cardPosts.setAttribute('id', 'cardPosts');
-          const cardBody = document.createElement('div');
-          cardBody.className = 'card-body';
-          const postName = document.createElement('h2');
-          postName.className = 'card-title m4';
-          postName.textContent = 'Посты';
-          cardPosts.append(cardBody);
-          cardBody.append(postName);//! !!!!!!!!!!!!!!!!!!!!//
-          const postsEl = document.querySelector('.posts');
-          postsEl.append(cardPosts);
+        if (state.urlLinks.length === 1) {
+          renderPostsContainer();
+          renderFeedsConstainer();
         }
 
         const [data] = value;
+        parsing(data).then((x) => renderFeeds(x));
         setTimeout(function run() {
           parsing(data).then((d) => renderRSS(d));
           setTimeout(run, 5000);
