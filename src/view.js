@@ -28,19 +28,22 @@ const foo = (state) => {
     inputform.value = '';
     inputform.focus();
   };
+
   const renderPosts = (posts) => {
-    const cardPosts = document.createElement('div');
+    /* const cardPosts = document.createElement('div');
     cardPosts.className = 'card border-0';
+    cardPosts.setAttribute('id', 'cardPosts');
     const cardBody = document.createElement('div');
     cardBody.className = 'card-body';
     const postName = document.createElement('h2');
     postName.className = 'card-title m4';
     postName.textContent = 'Посты';
     cardPosts.append(cardBody);
-    cardBody.append(postName);
+    cardBody.append(postName);//!!!!!!!!!!!!!!!!!!!!!//
     const postsEl = document.querySelector('.posts');
-    postsEl.append(cardPosts);
+    postsEl.append(cardPosts); */
     posts.map((post) => {
+      const cardPosts = document.getElementById('cardPosts');
       const ul = document.createElement('ul');
       ul.className = 'list-group border-0 rounded-0';
       const li = document.createElement('li');
@@ -66,6 +69,7 @@ const foo = (state) => {
     });
   };
   const renderRSS = (promise) => {
+    if (state) { renderLinks(); }
     console.log(promise);
     const feedDescription = promise.querySelector('description').textContent;
     const feedTitle = promise.querySelector('title').textContent;
@@ -84,10 +88,7 @@ const foo = (state) => {
       };
     });
     renderPosts(posts);
-    // сделал посты
-
-    // сделал фиды
-    const cardFeeds = document.createElement('div');
+    const cardFeeds = document.createElement('div');//! !!!!!!!!!!!!!!!!!!!!//
     cardFeeds.className = 'card border-0';
     const cardBodyFeed = document.createElement('div');
     cardBodyFeed.className = 'card-body';
@@ -95,7 +96,7 @@ const foo = (state) => {
     feedName.className = 'card-title h4';
     feedName.textContent = 'Фиды';
     cardFeeds.append(cardBodyFeed);
-    cardBodyFeed.append(feedName);
+    cardBodyFeed.append(feedName);//! !!!!!!!!!!!!!!!!!!!!!!!//
     const feeds1 = document.querySelector('.feeds');
     const ulFeeds = document.createElement('ul');
     ulFeeds.className = 'list-group border-0 rounded-0';
@@ -111,11 +112,8 @@ const foo = (state) => {
     listFeed.append(feedsDescription);
     ulFeeds.append(listFeed);
     cardFeeds.append(ulFeeds);
-    // Завершил делать фиды
-    //
     const ul = document.createElement('ul');
     ul.className = 'list-group border-0 rounded-0';
-
     const li = document.createElement('li');
     li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
     const a = document.createElement('a');
@@ -124,18 +122,32 @@ const foo = (state) => {
     const btn = document.createElement('button');
     btn.setAttribute('type', 'button');
     btn.className = 'btn btn-outline-primary btn-sm';
-
     feeds1.append(cardFeeds);
   };
+
   const watchedState = onChange(state, (path, value) => {
-    console.log(value);
     switch (path) {
       case 'urlLinks':
-        const [data] = value;
-        const x = parsing(data);
-        x.then((d) => renderRSS(d));
+        if (state.urlLinks.length == 1) {
+          const cardPosts = document.createElement('div');
+          cardPosts.className = 'card border-0';
+          cardPosts.setAttribute('id', 'cardPosts');
+          const cardBody = document.createElement('div');
+          cardBody.className = 'card-body';
+          const postName = document.createElement('h2');
+          postName.className = 'card-title m4';
+          postName.textContent = 'Посты';
+          cardPosts.append(cardBody);
+          cardBody.append(postName);//! !!!!!!!!!!!!!!!!!!!!//
+          const postsEl = document.querySelector('.posts');
+          postsEl.append(cardPosts);
+        }
 
-        renderLinks();
+        const [data] = value;
+        setTimeout(function run() {
+          parsing(data).then((d) => renderRSS(d));
+          setTimeout(run, 5000);
+        }, 0);
         break;
       case 'errors':
         renderErrors();
