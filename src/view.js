@@ -34,7 +34,7 @@ const foo = (state) => {
     cardBody.className = 'card-body';
     const postName = document.createElement('h2');
     postName.className = 'card-title m4';
-    postName.textContent = 'Посты';
+    postName.textContent = i18nextInstance1.t('posts');
     cardPosts.append(cardBody);
     cardBody.append(postName);
     const postsEl = document.querySelector('.posts');
@@ -49,7 +49,7 @@ const foo = (state) => {
     cardBodyFeed.className = 'card-body';
     const feedName = document.createElement('h2');
     feedName.className = 'card-title h4';
-    feedName.textContent = 'Фиды';
+    feedName.textContent = i18nextInstance1.t('feeds');
     cardFeeds.append(cardBodyFeed);
     cardBodyFeed.append(feedName);
     const feedsEl = document.querySelector('.feeds');
@@ -76,7 +76,7 @@ const foo = (state) => {
       btn.setAttribute('data-id', `${post['data-id']}`);
       btn.setAttribute('data-bs-toggle', 'modal');
       btn.setAttribute('data-bs-target', '#modal');
-      btn.textContent = 'Посмотреть';
+      btn.textContent = i18nextInstance1.t('btnView');
       li.prepend(a);
       li.append(btn);
       ul.append(li);
@@ -135,17 +135,25 @@ const foo = (state) => {
 
   const watchedState = onChange(state, (path, value) => {
     console.log(state);
+    console.log(value);
     switch (path) {
       case 'urlLinks':
+        const [data] = value;
         if (state.urlLinks.length === 1) {
           renderPostsContainer();
           renderFeedsConstainer();
         }
+        const promises = state.urlLinks.map((link) => {
+          console.log(link);
+          const prom = parsing(link);
+          return prom;
+        });
+        const promise = Promise.all(promises);
+        console.log(promise);
 
-        const [data] = value;
         parsing(data).then((x) => renderFeeds(x));
         setTimeout(function run() {
-          parsing(data).then((d) => renderRSS(d));
+          promise.then((contents) => contents.map((content) => renderRSS(content)));
           setTimeout(run, 5000);
         }, 0);
         break;

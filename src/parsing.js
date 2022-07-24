@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-
 const parsingHtml = (datas) => {
   const domparser = new DOMParser();
   const html = domparser.parseFromString(datas, 'text/xml');
