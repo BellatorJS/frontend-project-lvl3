@@ -1,6 +1,7 @@
 // BEGIN
 import onChange from 'on-change';
 import uniqueId from 'lodash/uniqueId.js';
+import differenceBy from 'lodash/differenceBy.js';
 import runI18 from './locales/locales.js';
 import parsing from './parsing.js';
 
@@ -83,28 +84,31 @@ const foo = (state) => {
       cardPosts.append(ul);
     });
   };
-  const renderFeeds = (promise) => {
-    const feedDescription = promise.querySelector('description').textContent;
-    const feedTitle = promise.querySelector('title').textContent;
-    const cardFeeds = document.getElementById('cardFeeds');
-    const feeds1 = document.querySelector('.feeds');
-    const ulFeeds = document.createElement('ul');
-    ulFeeds.className = 'list-group border-0 rounded-0';
-    const listFeed = document.createElement('li');
-    listFeed.className = 'list-group-item border-0 border-end-0';
-    const feedChanell = document.createElement('h3');
-    feedChanell.className = 'h6 m-0';
-    feedChanell.textContent = feedTitle;
-    const feedsDescription = document.createElement('p');
-    feedsDescription.textContent = feedDescription;
-    feedsDescription.className = 'm-0 small text-black-50';
-    listFeed.prepend(feedChanell);
-    listFeed.append(feedsDescription);
-    ulFeeds.append(listFeed);
-    cardFeeds.append(ulFeeds);
-    feeds1.append(cardFeeds);
+  const renderFeeds = (feeds) => {
+    feeds.forEach((feed) => {
+      const { feedDescription } = feed;
+      const { feedTitle } = feed;
+      const cardFeeds = document.getElementById('cardFeeds');
+      const feeds1 = document.querySelector('.feeds');
+      const ulFeeds = document.createElement('ul');
+      ulFeeds.className = 'list-group border-0 rounded-0';
+      const listFeed = document.createElement('li');
+      listFeed.className = 'list-group-item border-0 border-end-0';
+      const feedChanell = document.createElement('h3');
+      feedChanell.className = 'h6 m-0';
+      feedChanell.textContent = feedTitle;
+      const feedsDescription = document.createElement('p');
+      feedsDescription.textContent = feedDescription;
+      feedsDescription.className = 'm-0 small text-black-50';
+      listFeed.prepend(feedChanell);
+      listFeed.append(feedsDescription);
+      ulFeeds.append(listFeed);
+      cardFeeds.append(ulFeeds);
+      feeds1.append(cardFeeds);
+    });
   };
   const renderRSS = (promise) => {
+    state.posts.push('!!!!DDDD');
     if (state) { renderLinks(); }
     const items = Array.from(promise.querySelectorAll('item'));
     const posts = items.map((item) => {
@@ -134,12 +138,35 @@ const foo = (state) => {
   };
 
   const watchedState = onChange(state, (path, value) => {
-    console.log(state);
-    console.log(value);
     switch (path) {
       case 'urlLinks':
+        renderPostsContainer();
+        renderFeedsConstainer();
+
         const [data] = value;
-        if (state.urlLinks.length === 1) {
+        parsing(data)
+          .then(([feed, posts]) => {
+            watchedState.posts.push(...posts);
+            watchedState.feeds.push(...feed);
+          });
+        console.log(state);
+        setTimeout(function run() {
+          parsing(data)
+            .then(([feed, posts]) => {
+              const newFeeds = differenceBy(feed, state.feed, 'feedDescription');
+              if (newFeeds.length !== 0) {
+                watchedState.feeds.push(...newFeeds);
+              }
+              const newPosts = differenceBy(posts, state.posts, 'href');
+              console.log(newPosts);
+              watchedState.posts.push(...newPosts);
+            });
+
+          setTimeout(run, 5000);
+        }, 0);
+        /* watchedState.posts.push(posts);
+         watchedState.feeds.push(feed); */
+        /* if (state.urlLinks.length === 1) {
           renderPostsContainer();
           renderFeedsConstainer();
         }
@@ -155,10 +182,16 @@ const foo = (state) => {
         setTimeout(function run() {
           promise.then((contents) => contents.map((content) => renderRSS(content)));
           setTimeout(run, 5000);
-        }, 0);
+        }, 0); */
         break;
       case 'errors':
         renderErrors();
+        break;
+      case 'posts':
+        renderPosts(state.posts);
+        break;
+      case 'feeds':
+        renderFeeds(state.feeds);
         break;
       default:
         break;

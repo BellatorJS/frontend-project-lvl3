@@ -1171,6 +1171,16 @@ eval("var getNative = __webpack_require__(/*! ./_getNative */ \"./node_modules/l
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_apply.js":
+/*!***************************************!*\
+  !*** ./node_modules/lodash/_apply.js ***!
+  \***************************************/
+/***/ ((module) => {
+
+eval("/**\n * A faster alternative to `Function#apply`, this function invokes `func`\n * with the `this` binding of `thisArg` and the arguments of `args`.\n *\n * @private\n * @param {Function} func The function to invoke.\n * @param {*} thisArg The `this` binding of `func`.\n * @param {Array} args The arguments to invoke `func` with.\n * @returns {*} Returns the result of `func`.\n */\nfunction apply(func, thisArg, args) {\n  switch (args.length) {\n    case 0: return func.call(thisArg);\n    case 1: return func.call(thisArg, args[0]);\n    case 2: return func.call(thisArg, args[0], args[1]);\n    case 3: return func.call(thisArg, args[0], args[1], args[2]);\n  }\n  return func.apply(thisArg, args);\n}\n\nmodule.exports = apply;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_apply.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_arrayFilter.js":
 /*!*********************************************!*\
   !*** ./node_modules/lodash/_arrayFilter.js ***!
@@ -1178,6 +1188,26 @@ eval("var getNative = __webpack_require__(/*! ./_getNative */ \"./node_modules/l
 /***/ ((module) => {
 
 eval("/**\n * A specialized version of `_.filter` for arrays without support for\n * iteratee shorthands.\n *\n * @private\n * @param {Array} [array] The array to iterate over.\n * @param {Function} predicate The function invoked per iteration.\n * @returns {Array} Returns the new filtered array.\n */\nfunction arrayFilter(array, predicate) {\n  var index = -1,\n      length = array == null ? 0 : array.length,\n      resIndex = 0,\n      result = [];\n\n  while (++index < length) {\n    var value = array[index];\n    if (predicate(value, index, array)) {\n      result[resIndex++] = value;\n    }\n  }\n  return result;\n}\n\nmodule.exports = arrayFilter;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_arrayFilter.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_arrayIncludes.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_arrayIncludes.js ***!
+  \***********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var baseIndexOf = __webpack_require__(/*! ./_baseIndexOf */ \"./node_modules/lodash/_baseIndexOf.js\");\n\n/**\n * A specialized version of `_.includes` for arrays without support for\n * specifying an index to search from.\n *\n * @private\n * @param {Array} [array] The array to inspect.\n * @param {*} target The value to search for.\n * @returns {boolean} Returns `true` if `target` is found, else `false`.\n */\nfunction arrayIncludes(array, value) {\n  var length = array == null ? 0 : array.length;\n  return !!length && baseIndexOf(array, value, 0) > -1;\n}\n\nmodule.exports = arrayIncludes;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_arrayIncludes.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_arrayIncludesWith.js":
+/*!***************************************************!*\
+  !*** ./node_modules/lodash/_arrayIncludesWith.js ***!
+  \***************************************************/
+/***/ ((module) => {
+
+eval("/**\n * This function is like `arrayIncludes` except that it accepts a comparator.\n *\n * @private\n * @param {Array} [array] The array to inspect.\n * @param {*} target The value to search for.\n * @param {Function} comparator The comparator invoked per element.\n * @returns {boolean} Returns `true` if `target` is found, else `false`.\n */\nfunction arrayIncludesWith(array, value, comparator) {\n  var index = -1,\n      length = array == null ? 0 : array.length;\n\n  while (++index < length) {\n    if (comparator(value, array[index])) {\n      return true;\n    }\n  }\n  return false;\n}\n\nmodule.exports = arrayIncludesWith;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_arrayIncludesWith.js?");
 
 /***/ }),
 
@@ -1271,6 +1301,36 @@ eval("var defineProperty = __webpack_require__(/*! ./_defineProperty */ \"./node
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_baseDifference.js":
+/*!************************************************!*\
+  !*** ./node_modules/lodash/_baseDifference.js ***!
+  \************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var SetCache = __webpack_require__(/*! ./_SetCache */ \"./node_modules/lodash/_SetCache.js\"),\n    arrayIncludes = __webpack_require__(/*! ./_arrayIncludes */ \"./node_modules/lodash/_arrayIncludes.js\"),\n    arrayIncludesWith = __webpack_require__(/*! ./_arrayIncludesWith */ \"./node_modules/lodash/_arrayIncludesWith.js\"),\n    arrayMap = __webpack_require__(/*! ./_arrayMap */ \"./node_modules/lodash/_arrayMap.js\"),\n    baseUnary = __webpack_require__(/*! ./_baseUnary */ \"./node_modules/lodash/_baseUnary.js\"),\n    cacheHas = __webpack_require__(/*! ./_cacheHas */ \"./node_modules/lodash/_cacheHas.js\");\n\n/** Used as the size to enable large array optimizations. */\nvar LARGE_ARRAY_SIZE = 200;\n\n/**\n * The base implementation of methods like `_.difference` without support\n * for excluding multiple arrays or iteratee shorthands.\n *\n * @private\n * @param {Array} array The array to inspect.\n * @param {Array} values The values to exclude.\n * @param {Function} [iteratee] The iteratee invoked per element.\n * @param {Function} [comparator] The comparator invoked per element.\n * @returns {Array} Returns the new array of filtered values.\n */\nfunction baseDifference(array, values, iteratee, comparator) {\n  var index = -1,\n      includes = arrayIncludes,\n      isCommon = true,\n      length = array.length,\n      result = [],\n      valuesLength = values.length;\n\n  if (!length) {\n    return result;\n  }\n  if (iteratee) {\n    values = arrayMap(values, baseUnary(iteratee));\n  }\n  if (comparator) {\n    includes = arrayIncludesWith;\n    isCommon = false;\n  }\n  else if (values.length >= LARGE_ARRAY_SIZE) {\n    includes = cacheHas;\n    isCommon = false;\n    values = new SetCache(values);\n  }\n  outer:\n  while (++index < length) {\n    var value = array[index],\n        computed = iteratee == null ? value : iteratee(value);\n\n    value = (comparator || value !== 0) ? value : 0;\n    if (isCommon && computed === computed) {\n      var valuesIndex = valuesLength;\n      while (valuesIndex--) {\n        if (values[valuesIndex] === computed) {\n          continue outer;\n        }\n      }\n      result.push(value);\n    }\n    else if (!includes(values, computed, comparator)) {\n      result.push(value);\n    }\n  }\n  return result;\n}\n\nmodule.exports = baseDifference;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseDifference.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseFindIndex.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_baseFindIndex.js ***!
+  \***********************************************/
+/***/ ((module) => {
+
+eval("/**\n * The base implementation of `_.findIndex` and `_.findLastIndex` without\n * support for iteratee shorthands.\n *\n * @private\n * @param {Array} array The array to inspect.\n * @param {Function} predicate The function invoked per iteration.\n * @param {number} fromIndex The index to search from.\n * @param {boolean} [fromRight] Specify iterating from right to left.\n * @returns {number} Returns the index of the matched value, else `-1`.\n */\nfunction baseFindIndex(array, predicate, fromIndex, fromRight) {\n  var length = array.length,\n      index = fromIndex + (fromRight ? 1 : -1);\n\n  while ((fromRight ? index-- : ++index < length)) {\n    if (predicate(array[index], index, array)) {\n      return index;\n    }\n  }\n  return -1;\n}\n\nmodule.exports = baseFindIndex;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseFindIndex.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseFlatten.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/_baseFlatten.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var arrayPush = __webpack_require__(/*! ./_arrayPush */ \"./node_modules/lodash/_arrayPush.js\"),\n    isFlattenable = __webpack_require__(/*! ./_isFlattenable */ \"./node_modules/lodash/_isFlattenable.js\");\n\n/**\n * The base implementation of `_.flatten` with support for restricting flattening.\n *\n * @private\n * @param {Array} array The array to flatten.\n * @param {number} depth The maximum recursion depth.\n * @param {boolean} [predicate=isFlattenable] The function invoked per iteration.\n * @param {boolean} [isStrict] Restrict to values that pass `predicate` checks.\n * @param {Array} [result=[]] The initial result value.\n * @returns {Array} Returns the new flattened array.\n */\nfunction baseFlatten(array, depth, predicate, isStrict, result) {\n  var index = -1,\n      length = array.length;\n\n  predicate || (predicate = isFlattenable);\n  result || (result = []);\n\n  while (++index < length) {\n    var value = array[index];\n    if (depth > 0 && predicate(value)) {\n      if (depth > 1) {\n        // Recursively flatten arrays (susceptible to call stack limits).\n        baseFlatten(value, depth - 1, predicate, isStrict, result);\n      } else {\n        arrayPush(result, value);\n      }\n    } else if (!isStrict) {\n      result[result.length] = value;\n    }\n  }\n  return result;\n}\n\nmodule.exports = baseFlatten;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseFlatten.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseFor.js":
 /*!*****************************************!*\
   !*** ./node_modules/lodash/_baseFor.js ***!
@@ -1341,6 +1401,16 @@ eval("/**\n * The base implementation of `_.hasIn` without support for deep path
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_baseIndexOf.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/_baseIndexOf.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var baseFindIndex = __webpack_require__(/*! ./_baseFindIndex */ \"./node_modules/lodash/_baseFindIndex.js\"),\n    baseIsNaN = __webpack_require__(/*! ./_baseIsNaN */ \"./node_modules/lodash/_baseIsNaN.js\"),\n    strictIndexOf = __webpack_require__(/*! ./_strictIndexOf */ \"./node_modules/lodash/_strictIndexOf.js\");\n\n/**\n * The base implementation of `_.indexOf` without `fromIndex` bounds checks.\n *\n * @private\n * @param {Array} array The array to inspect.\n * @param {*} value The value to search for.\n * @param {number} fromIndex The index to search from.\n * @returns {number} Returns the index of the matched value, else `-1`.\n */\nfunction baseIndexOf(array, value, fromIndex) {\n  return value === value\n    ? strictIndexOf(array, value, fromIndex)\n    : baseFindIndex(array, baseIsNaN, fromIndex);\n}\n\nmodule.exports = baseIndexOf;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseIndexOf.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_baseIsArguments.js":
 /*!*************************************************!*\
   !*** ./node_modules/lodash/_baseIsArguments.js ***!
@@ -1378,6 +1448,16 @@ eval("var Stack = __webpack_require__(/*! ./_Stack */ \"./node_modules/lodash/_S
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 eval("var Stack = __webpack_require__(/*! ./_Stack */ \"./node_modules/lodash/_Stack.js\"),\n    baseIsEqual = __webpack_require__(/*! ./_baseIsEqual */ \"./node_modules/lodash/_baseIsEqual.js\");\n\n/** Used to compose bitmasks for value comparisons. */\nvar COMPARE_PARTIAL_FLAG = 1,\n    COMPARE_UNORDERED_FLAG = 2;\n\n/**\n * The base implementation of `_.isMatch` without support for iteratee shorthands.\n *\n * @private\n * @param {Object} object The object to inspect.\n * @param {Object} source The object of property values to match.\n * @param {Array} matchData The property names, values, and compare flags to match.\n * @param {Function} [customizer] The function to customize comparisons.\n * @returns {boolean} Returns `true` if `object` is a match, else `false`.\n */\nfunction baseIsMatch(object, source, matchData, customizer) {\n  var index = matchData.length,\n      length = index,\n      noCustomizer = !customizer;\n\n  if (object == null) {\n    return !length;\n  }\n  object = Object(object);\n  while (index--) {\n    var data = matchData[index];\n    if ((noCustomizer && data[2])\n          ? data[1] !== object[data[0]]\n          : !(data[0] in object)\n        ) {\n      return false;\n    }\n  }\n  while (++index < length) {\n    data = matchData[index];\n    var key = data[0],\n        objValue = object[key],\n        srcValue = data[1];\n\n    if (noCustomizer && data[2]) {\n      if (objValue === undefined && !(key in object)) {\n        return false;\n      }\n    } else {\n      var stack = new Stack;\n      if (customizer) {\n        var result = customizer(objValue, srcValue, key, object, source, stack);\n      }\n      if (!(result === undefined\n            ? baseIsEqual(srcValue, objValue, COMPARE_PARTIAL_FLAG | COMPARE_UNORDERED_FLAG, customizer, stack)\n            : result\n          )) {\n        return false;\n      }\n    }\n  }\n  return true;\n}\n\nmodule.exports = baseIsMatch;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseIsMatch.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseIsNaN.js":
+/*!*******************************************!*\
+  !*** ./node_modules/lodash/_baseIsNaN.js ***!
+  \*******************************************/
+/***/ ((module) => {
+
+eval("/**\n * The base implementation of `_.isNaN` without support for number objects.\n *\n * @private\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is `NaN`, else `false`.\n */\nfunction baseIsNaN(value) {\n  return value !== value;\n}\n\nmodule.exports = baseIsNaN;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseIsNaN.js?");
 
 /***/ }),
 
@@ -1468,6 +1548,26 @@ eval("var baseGet = __webpack_require__(/*! ./_baseGet */ \"./node_modules/lodas
 /***/ ((module) => {
 
 eval("/**\n * The base implementation of `_.propertyOf` without support for deep paths.\n *\n * @private\n * @param {Object} object The object to query.\n * @returns {Function} Returns the new accessor function.\n */\nfunction basePropertyOf(object) {\n  return function(key) {\n    return object == null ? undefined : object[key];\n  };\n}\n\nmodule.exports = basePropertyOf;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_basePropertyOf.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseRest.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_baseRest.js ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var identity = __webpack_require__(/*! ./identity */ \"./node_modules/lodash/identity.js\"),\n    overRest = __webpack_require__(/*! ./_overRest */ \"./node_modules/lodash/_overRest.js\"),\n    setToString = __webpack_require__(/*! ./_setToString */ \"./node_modules/lodash/_setToString.js\");\n\n/**\n * The base implementation of `_.rest` which doesn't validate or coerce arguments.\n *\n * @private\n * @param {Function} func The function to apply a rest parameter to.\n * @param {number} [start=func.length-1] The start position of the rest parameter.\n * @returns {Function} Returns the new function.\n */\nfunction baseRest(func, start) {\n  return setToString(overRest(func, start, identity), func + '');\n}\n\nmodule.exports = baseRest;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseRest.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_baseSetToString.js":
+/*!*************************************************!*\
+  !*** ./node_modules/lodash/_baseSetToString.js ***!
+  \*************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var constant = __webpack_require__(/*! ./constant */ \"./node_modules/lodash/constant.js\"),\n    defineProperty = __webpack_require__(/*! ./_defineProperty */ \"./node_modules/lodash/_defineProperty.js\"),\n    identity = __webpack_require__(/*! ./identity */ \"./node_modules/lodash/identity.js\");\n\n/**\n * The base implementation of `setToString` without support for hot loop shorting.\n *\n * @private\n * @param {Function} func The function to modify.\n * @param {Function} string The `toString` result.\n * @returns {Function} Returns `func`.\n */\nvar baseSetToString = !defineProperty ? identity : function(func, string) {\n  return defineProperty(func, 'toString', {\n    'configurable': true,\n    'enumerable': false,\n    'value': constant(string),\n    'writable': true\n  });\n};\n\nmodule.exports = baseSetToString;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_baseSetToString.js?");
 
 /***/ }),
 
@@ -1801,6 +1901,16 @@ eval("var nativeCreate = __webpack_require__(/*! ./_nativeCreate */ \"./node_mod
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_isFlattenable.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_isFlattenable.js ***!
+  \***********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var Symbol = __webpack_require__(/*! ./_Symbol */ \"./node_modules/lodash/_Symbol.js\"),\n    isArguments = __webpack_require__(/*! ./isArguments */ \"./node_modules/lodash/isArguments.js\"),\n    isArray = __webpack_require__(/*! ./isArray */ \"./node_modules/lodash/isArray.js\");\n\n/** Built-in value references. */\nvar spreadableSymbol = Symbol ? Symbol.isConcatSpreadable : undefined;\n\n/**\n * Checks if `value` is a flattenable `arguments` object or array.\n *\n * @private\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is flattenable, else `false`.\n */\nfunction isFlattenable(value) {\n  return isArray(value) || isArguments(value) ||\n    !!(spreadableSymbol && value && value[spreadableSymbol]);\n}\n\nmodule.exports = isFlattenable;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_isFlattenable.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_isIndex.js":
 /*!*****************************************!*\
   !*** ./node_modules/lodash/_isIndex.js ***!
@@ -2041,6 +2151,16 @@ eval("/**\n * Creates a unary function that invokes `func` with its argument tra
 
 /***/ }),
 
+/***/ "./node_modules/lodash/_overRest.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_overRest.js ***!
+  \******************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var apply = __webpack_require__(/*! ./_apply */ \"./node_modules/lodash/_apply.js\");\n\n/* Built-in method references for those with the same name as other `lodash` methods. */\nvar nativeMax = Math.max;\n\n/**\n * A specialized version of `baseRest` which transforms the rest array.\n *\n * @private\n * @param {Function} func The function to apply a rest parameter to.\n * @param {number} [start=func.length-1] The start position of the rest parameter.\n * @param {Function} transform The rest array transform.\n * @returns {Function} Returns the new function.\n */\nfunction overRest(func, start, transform) {\n  start = nativeMax(start === undefined ? (func.length - 1) : start, 0);\n  return function() {\n    var args = arguments,\n        index = -1,\n        length = nativeMax(args.length - start, 0),\n        array = Array(length);\n\n    while (++index < length) {\n      array[index] = args[start + index];\n    }\n    index = -1;\n    var otherArgs = Array(start + 1);\n    while (++index < start) {\n      otherArgs[index] = args[index];\n    }\n    otherArgs[start] = transform(array);\n    return apply(func, this, otherArgs);\n  };\n}\n\nmodule.exports = overRest;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_overRest.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/_root.js":
 /*!**************************************!*\
   !*** ./node_modules/lodash/_root.js ***!
@@ -2078,6 +2198,26 @@ eval("/**\n * Checks if `value` is in the array cache.\n *\n * @private\n * @nam
 /***/ ((module) => {
 
 eval("/**\n * Converts `set` to an array of its values.\n *\n * @private\n * @param {Object} set The set to convert.\n * @returns {Array} Returns the values.\n */\nfunction setToArray(set) {\n  var index = -1,\n      result = Array(set.size);\n\n  set.forEach(function(value) {\n    result[++index] = value;\n  });\n  return result;\n}\n\nmodule.exports = setToArray;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_setToArray.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_setToString.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/_setToString.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var baseSetToString = __webpack_require__(/*! ./_baseSetToString */ \"./node_modules/lodash/_baseSetToString.js\"),\n    shortOut = __webpack_require__(/*! ./_shortOut */ \"./node_modules/lodash/_shortOut.js\");\n\n/**\n * Sets the `toString` method of `func` to return `string`.\n *\n * @private\n * @param {Function} func The function to modify.\n * @param {Function} string The `toString` result.\n * @returns {Function} Returns `func`.\n */\nvar setToString = shortOut(baseSetToString);\n\nmodule.exports = setToString;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_setToString.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_shortOut.js":
+/*!******************************************!*\
+  !*** ./node_modules/lodash/_shortOut.js ***!
+  \******************************************/
+/***/ ((module) => {
+
+eval("/** Used to detect hot functions by number of calls within a span of milliseconds. */\nvar HOT_COUNT = 800,\n    HOT_SPAN = 16;\n\n/* Built-in method references for those with the same name as other `lodash` methods. */\nvar nativeNow = Date.now;\n\n/**\n * Creates a function that'll short out and invoke `identity` instead\n * of `func` when it's called `HOT_COUNT` or more times in `HOT_SPAN`\n * milliseconds.\n *\n * @private\n * @param {Function} func The function to restrict.\n * @returns {Function} Returns the new shortable function.\n */\nfunction shortOut(func) {\n  var count = 0,\n      lastCalled = 0;\n\n  return function() {\n    var stamp = nativeNow(),\n        remaining = HOT_SPAN - (stamp - lastCalled);\n\n    lastCalled = stamp;\n    if (remaining > 0) {\n      if (++count >= HOT_COUNT) {\n        return arguments[0];\n      }\n    } else {\n      count = 0;\n    }\n    return func.apply(undefined, arguments);\n  };\n}\n\nmodule.exports = shortOut;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_shortOut.js?");
 
 /***/ }),
 
@@ -2128,6 +2268,16 @@ eval("/**\n * Checks if a stack value for `key` exists.\n *\n * @private\n * @na
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 eval("var ListCache = __webpack_require__(/*! ./_ListCache */ \"./node_modules/lodash/_ListCache.js\"),\n    Map = __webpack_require__(/*! ./_Map */ \"./node_modules/lodash/_Map.js\"),\n    MapCache = __webpack_require__(/*! ./_MapCache */ \"./node_modules/lodash/_MapCache.js\");\n\n/** Used as the size to enable large array optimizations. */\nvar LARGE_ARRAY_SIZE = 200;\n\n/**\n * Sets the stack `key` to `value`.\n *\n * @private\n * @name set\n * @memberOf Stack\n * @param {string} key The key of the value to set.\n * @param {*} value The value to set.\n * @returns {Object} Returns the stack cache instance.\n */\nfunction stackSet(key, value) {\n  var data = this.__data__;\n  if (data instanceof ListCache) {\n    var pairs = data.__data__;\n    if (!Map || (pairs.length < LARGE_ARRAY_SIZE - 1)) {\n      pairs.push([key, value]);\n      this.size = ++data.size;\n      return this;\n    }\n    data = this.__data__ = new MapCache(pairs);\n  }\n  data.set(key, value);\n  this.size = data.size;\n  return this;\n}\n\nmodule.exports = stackSet;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_stackSet.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/_strictIndexOf.js":
+/*!***********************************************!*\
+  !*** ./node_modules/lodash/_strictIndexOf.js ***!
+  \***********************************************/
+/***/ ((module) => {
+
+eval("/**\n * A specialized version of `_.indexOf` which performs strict equality\n * comparisons of values, i.e. `===`.\n *\n * @private\n * @param {Array} array The array to inspect.\n * @param {*} value The value to search for.\n * @param {number} fromIndex The index to search from.\n * @returns {number} Returns the index of the matched value, else `-1`.\n */\nfunction strictIndexOf(array, value, fromIndex) {\n  var index = fromIndex - 1,\n      length = array.length;\n\n  while (++index < length) {\n    if (array[index] === value) {\n      return index;\n    }\n  }\n  return -1;\n}\n\nmodule.exports = strictIndexOf;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/_strictIndexOf.js?");
 
 /***/ }),
 
@@ -2211,6 +2361,16 @@ eval("var toString = __webpack_require__(/*! ./toString */ \"./node_modules/loda
 
 /***/ }),
 
+/***/ "./node_modules/lodash/constant.js":
+/*!*****************************************!*\
+  !*** ./node_modules/lodash/constant.js ***!
+  \*****************************************/
+/***/ ((module) => {
+
+eval("/**\n * Creates a function that returns `value`.\n *\n * @static\n * @memberOf _\n * @since 2.4.0\n * @category Util\n * @param {*} value The value to return from the new function.\n * @returns {Function} Returns the new constant function.\n * @example\n *\n * var objects = _.times(2, _.constant({ 'a': 1 }));\n *\n * console.log(objects);\n * // => [{ 'a': 1 }, { 'a': 1 }]\n *\n * console.log(objects[0] === objects[1]);\n * // => true\n */\nfunction constant(value) {\n  return function() {\n    return value;\n  };\n}\n\nmodule.exports = constant;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/constant.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/deburr.js":
 /*!***************************************!*\
   !*** ./node_modules/lodash/deburr.js ***!
@@ -2218,6 +2378,16 @@ eval("var toString = __webpack_require__(/*! ./toString */ \"./node_modules/loda
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 eval("var deburrLetter = __webpack_require__(/*! ./_deburrLetter */ \"./node_modules/lodash/_deburrLetter.js\"),\n    toString = __webpack_require__(/*! ./toString */ \"./node_modules/lodash/toString.js\");\n\n/** Used to match Latin Unicode letters (excluding mathematical operators). */\nvar reLatin = /[\\xc0-\\xd6\\xd8-\\xf6\\xf8-\\xff\\u0100-\\u017f]/g;\n\n/** Used to compose unicode character classes. */\nvar rsComboMarksRange = '\\\\u0300-\\\\u036f',\n    reComboHalfMarksRange = '\\\\ufe20-\\\\ufe2f',\n    rsComboSymbolsRange = '\\\\u20d0-\\\\u20ff',\n    rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange;\n\n/** Used to compose unicode capture groups. */\nvar rsCombo = '[' + rsComboRange + ']';\n\n/**\n * Used to match [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks) and\n * [combining diacritical marks for symbols](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks_for_Symbols).\n */\nvar reComboMark = RegExp(rsCombo, 'g');\n\n/**\n * Deburrs `string` by converting\n * [Latin-1 Supplement](https://en.wikipedia.org/wiki/Latin-1_Supplement_(Unicode_block)#Character_table)\n * and [Latin Extended-A](https://en.wikipedia.org/wiki/Latin_Extended-A)\n * letters to basic Latin letters and removing\n * [combining diacritical marks](https://en.wikipedia.org/wiki/Combining_Diacritical_Marks).\n *\n * @static\n * @memberOf _\n * @since 3.0.0\n * @category String\n * @param {string} [string=''] The string to deburr.\n * @returns {string} Returns the deburred string.\n * @example\n *\n * _.deburr('déjà vu');\n * // => 'deja vu'\n */\nfunction deburr(string) {\n  string = toString(string);\n  return string && string.replace(reLatin, deburrLetter).replace(reComboMark, '');\n}\n\nmodule.exports = deburr;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/deburr.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/differenceBy.js":
+/*!*********************************************!*\
+  !*** ./node_modules/lodash/differenceBy.js ***!
+  \*********************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var baseDifference = __webpack_require__(/*! ./_baseDifference */ \"./node_modules/lodash/_baseDifference.js\"),\n    baseFlatten = __webpack_require__(/*! ./_baseFlatten */ \"./node_modules/lodash/_baseFlatten.js\"),\n    baseIteratee = __webpack_require__(/*! ./_baseIteratee */ \"./node_modules/lodash/_baseIteratee.js\"),\n    baseRest = __webpack_require__(/*! ./_baseRest */ \"./node_modules/lodash/_baseRest.js\"),\n    isArrayLikeObject = __webpack_require__(/*! ./isArrayLikeObject */ \"./node_modules/lodash/isArrayLikeObject.js\"),\n    last = __webpack_require__(/*! ./last */ \"./node_modules/lodash/last.js\");\n\n/**\n * This method is like `_.difference` except that it accepts `iteratee` which\n * is invoked for each element of `array` and `values` to generate the criterion\n * by which they're compared. The order and references of result values are\n * determined by the first array. The iteratee is invoked with one argument:\n * (value).\n *\n * **Note:** Unlike `_.pullAllBy`, this method returns a new array.\n *\n * @static\n * @memberOf _\n * @since 4.0.0\n * @category Array\n * @param {Array} array The array to inspect.\n * @param {...Array} [values] The values to exclude.\n * @param {Function} [iteratee=_.identity] The iteratee invoked per element.\n * @returns {Array} Returns the new array of filtered values.\n * @example\n *\n * _.differenceBy([2.1, 1.2], [2.3, 3.4], Math.floor);\n * // => [1.2]\n *\n * // The `_.property` iteratee shorthand.\n * _.differenceBy([{ 'x': 2 }, { 'x': 1 }], [{ 'x': 1 }], 'x');\n * // => [{ 'x': 2 }]\n */\nvar differenceBy = baseRest(function(array, values) {\n  var iteratee = last(values);\n  if (isArrayLikeObject(iteratee)) {\n    iteratee = undefined;\n  }\n  return isArrayLikeObject(array)\n    ? baseDifference(array, baseFlatten(values, 1, isArrayLikeObject, true), baseIteratee(iteratee, 2))\n    : [];\n});\n\nmodule.exports = differenceBy;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/differenceBy.js?");
 
 /***/ }),
 
@@ -2301,6 +2471,16 @@ eval("var isFunction = __webpack_require__(/*! ./isFunction */ \"./node_modules/
 
 /***/ }),
 
+/***/ "./node_modules/lodash/isArrayLikeObject.js":
+/*!**************************************************!*\
+  !*** ./node_modules/lodash/isArrayLikeObject.js ***!
+  \**************************************************/
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+eval("var isArrayLike = __webpack_require__(/*! ./isArrayLike */ \"./node_modules/lodash/isArrayLike.js\"),\n    isObjectLike = __webpack_require__(/*! ./isObjectLike */ \"./node_modules/lodash/isObjectLike.js\");\n\n/**\n * This method is like `_.isArrayLike` except that it also checks if `value`\n * is an object.\n *\n * @static\n * @memberOf _\n * @since 4.0.0\n * @category Lang\n * @param {*} value The value to check.\n * @returns {boolean} Returns `true` if `value` is an array-like object,\n *  else `false`.\n * @example\n *\n * _.isArrayLikeObject([1, 2, 3]);\n * // => true\n *\n * _.isArrayLikeObject(document.body.children);\n * // => true\n *\n * _.isArrayLikeObject('abc');\n * // => false\n *\n * _.isArrayLikeObject(_.noop);\n * // => false\n */\nfunction isArrayLikeObject(value) {\n  return isObjectLike(value) && isArrayLike(value);\n}\n\nmodule.exports = isArrayLikeObject;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/isArrayLikeObject.js?");
+
+/***/ }),
+
 /***/ "./node_modules/lodash/isBuffer.js":
 /*!*****************************************!*\
   !*** ./node_modules/lodash/isBuffer.js ***!
@@ -2378,6 +2558,16 @@ eval("var baseIsTypedArray = __webpack_require__(/*! ./_baseIsTypedArray */ \"./
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 eval("var arrayLikeKeys = __webpack_require__(/*! ./_arrayLikeKeys */ \"./node_modules/lodash/_arrayLikeKeys.js\"),\n    baseKeys = __webpack_require__(/*! ./_baseKeys */ \"./node_modules/lodash/_baseKeys.js\"),\n    isArrayLike = __webpack_require__(/*! ./isArrayLike */ \"./node_modules/lodash/isArrayLike.js\");\n\n/**\n * Creates an array of the own enumerable property names of `object`.\n *\n * **Note:** Non-object values are coerced to objects. See the\n * [ES spec](http://ecma-international.org/ecma-262/7.0/#sec-object.keys)\n * for more details.\n *\n * @static\n * @since 0.1.0\n * @memberOf _\n * @category Object\n * @param {Object} object The object to query.\n * @returns {Array} Returns the array of property names.\n * @example\n *\n * function Foo() {\n *   this.a = 1;\n *   this.b = 2;\n * }\n *\n * Foo.prototype.c = 3;\n *\n * _.keys(new Foo);\n * // => ['a', 'b'] (iteration order is not guaranteed)\n *\n * _.keys('hi');\n * // => ['0', '1']\n */\nfunction keys(object) {\n  return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);\n}\n\nmodule.exports = keys;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/keys.js?");
+
+/***/ }),
+
+/***/ "./node_modules/lodash/last.js":
+/*!*************************************!*\
+  !*** ./node_modules/lodash/last.js ***!
+  \*************************************/
+/***/ ((module) => {
+
+eval("/**\n * Gets the last element of `array`.\n *\n * @static\n * @memberOf _\n * @since 0.1.0\n * @category Array\n * @param {Array} array The array to query.\n * @returns {*} Returns the last element of `array`.\n * @example\n *\n * _.last([1, 2, 3]);\n * // => 3\n */\nfunction last(array) {\n  var length = array == null ? 0 : array.length;\n  return length ? array[length - 1] : undefined;\n}\n\nmodule.exports = last;\n\n\n//# sourceURL=webpack://@hexlet/code/./node_modules/lodash/last.js?");
 
 /***/ }),
 
@@ -2893,7 +3083,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bootstrap */ \"./node_modules/bootstrap/dist/js/bootstrap.esm.js\");\n/* harmony import */ var _scss_custom_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scss/_custom.scss */ \"./src/scss/_custom.scss\");\n/* harmony import */ var yup__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! yup */ \"./node_modules/yup/es/index.js\");\n/* harmony import */ var i18next__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! i18next */ \"./node_modules/i18next/dist/esm/i18next.js\");\n/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view.js */ \"./src/view.js\");\n/* harmony import */ var _locales_locales_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./locales/locales.js */ \"./src/locales/locales.js\");\n\n\n\n\n\n\n\n\nconst state = {\n  urlLinks: [],\n  feeds: [],\n  posts: [],\n  errors: [],\n};\n\nconst watchedState = (0,_view_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(state);\nconst i18nextInstance1 = (0,_locales_locales_js__WEBPACK_IMPORTED_MODULE_5__[\"default\"])();\n\nconst form = document.querySelector('.rss-form');\n\nform.addEventListener('submit', (e) => {\n  e.preventDefault();\n  const formData = new FormData(e.target);\n  const formUrlValue = formData.get('url');\n  const formDates = Object.fromEntries(formData);\n  (0,yup__WEBPACK_IMPORTED_MODULE_2__.setLocale)({\n    string: {\n      url: i18nextInstance1.t('errorURL'),\n    },\n    mixed: {\n      notOneOf: i18nextInstance1.t('errorRepeat'),\n    },\n  });\n\n  const schema = yup__WEBPACK_IMPORTED_MODULE_2__.object().shape({\n    url: yup__WEBPACK_IMPORTED_MODULE_2__.string().url().notOneOf(state.urlLinks),\n  });\n\n  schema.validate(formDates)\n    .then(() => {\n      watchedState.urlLinks.push(formUrlValue);\n    })\n    .catch((err) => {\n      const [error] = err.errors;\n      watchedState.errors.push(error);\n    });\n  state.errors = [];\n});\n\n\n//# sourceURL=webpack://@hexlet/code/./src/index.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var bootstrap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! bootstrap */ \"./node_modules/bootstrap/dist/js/bootstrap.esm.js\");\n/* harmony import */ var _scss_custom_scss__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scss/_custom.scss */ \"./src/scss/_custom.scss\");\n/* harmony import */ var yup__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! yup */ \"./node_modules/yup/es/index.js\");\n/* harmony import */ var i18next__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! i18next */ \"./node_modules/i18next/dist/esm/i18next.js\");\n/* harmony import */ var _view_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./view.js */ \"./src/view.js\");\n/* harmony import */ var _locales_locales_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./locales/locales.js */ \"./src/locales/locales.js\");\n/* harmony import */ var _parsing_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./parsing.js */ \"./src/parsing.js\");\n\n\n\n\n\n\n\n\n\nconst state = {\n  urlLinks: [],\n  feeds: [],\n  posts: [],\n  errors: [],\n};\n\nconst watchedState = (0,_view_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(state);\n\nconst i18nextInstance1 = (0,_locales_locales_js__WEBPACK_IMPORTED_MODULE_5__[\"default\"])();\n\nconst form = document.querySelector('.rss-form');\n\nform.addEventListener('submit', (e) => {\n  e.preventDefault();\n  const formData = new FormData(e.target);\n  const formUrlValue = formData.get('url');\n  const formDates = Object.fromEntries(formData);\n  (0,yup__WEBPACK_IMPORTED_MODULE_2__.setLocale)({\n    string: {\n      url: i18nextInstance1.t('errorURL'),\n    },\n    mixed: {\n      notOneOf: i18nextInstance1.t('errorRepeat'),\n    },\n  });\n\n  const schema = yup__WEBPACK_IMPORTED_MODULE_2__.object().shape({\n    url: yup__WEBPACK_IMPORTED_MODULE_2__.string().url().notOneOf(state.urlLinks),\n  });\n\n  schema.validate(formDates)\n    .then(() => {\n      watchedState.urlLinks.push(formUrlValue);\n    })\n    .catch((err) => {\n      const [error] = err.errors;\n      watchedState.errors.push(error);\n    });\n  state.errors = [];\n});\n\n\n//# sourceURL=webpack://@hexlet/code/./src/index.js?");
 
 /***/ }),
 
@@ -2915,7 +3105,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ \"./node_modules/axios/index.js\");\n/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);\n\n\nconst parsingHtml = (datas) => {\n  const domparser = new DOMParser();\n  const html = domparser.parseFromString(datas, 'text/xml');\n  return html;\n};\nfunction parsing(rssLink) {\n  const result = axios__WEBPACK_IMPORTED_MODULE_0___default().get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${rssLink}`)}`)\n    .then((response) => response.data.contents)\n    .then((response1) => parsingHtml(response1))\n    .then((data) => (data))\n    .catch(() => console.log('!!!!'));\n  return result;\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (parsing);\n\n\n//# sourceURL=webpack://@hexlet/code/./src/parsing.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ \"./node_modules/axios/index.js\");\n/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/uniqueId.js */ \"./node_modules/lodash/uniqueId.js\");\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__);\n\n\n\nconst getParsingDatas = (promise) => {\n  const feedContainer = [];\n  const feedDescription = promise.querySelector('description').textContent;\n  const feedTitle = promise.querySelector('title').textContent;\n  const feedlink = promise.querySelector('link').textContent;\n  const feedId = lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default()();\n  const feedContent = {\n    feedDescription,\n    feedTitle,\n    feedlink,\n    feedId,\n  };\n  feedContainer.push(feedContent);\n  // if (state) { renderLinks(); }\n  const items = Array.from(promise.querySelectorAll('item'));\n const posts = items.map((post) => {\n    const id = lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default()();\n    const title = post.querySelector('title').textContent;\n    const link = post.querySelector('link').textContent;\n    const description = post.querySelector('description').textContent;\n    return {\n      'data-id': id,\n      href: link,\n      title,\n      description,\n    };\n  });\n  return [feedContainer, posts];\n};\n\nconst parsingHtml = (datas) => {\n  const domparser = new DOMParser();\n  const html = domparser.parseFromString(datas, 'text/xml');\n  return html;\n};\nfunction parsing(rssLink) {\n  const result = axios__WEBPACK_IMPORTED_MODULE_0___default().get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${rssLink}`)}`)\n    .then((response) => response.data.contents)\n    .then((response1) => parsingHtml(response1))\n    .then((data) => getParsingDatas(data))\n    .catch(() => console.log('!!!!'));\n  return result;\n}\n\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (parsing);\n\n\n//# sourceURL=webpack://@hexlet/code/./src/parsing.js?");
 
 /***/ }),
 
@@ -2926,7 +3116,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var on_change__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! on-change */ \"./node_modules/on-change/index.js\");\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/uniqueId.js */ \"./node_modules/lodash/uniqueId.js\");\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var _locales_locales_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./locales/locales.js */ \"./src/locales/locales.js\");\n/* harmony import */ var _parsing_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./parsing.js */ \"./src/parsing.js\");\n// BEGIN\n\n\n\n\n\nconst foo = (state) => {\n  const feedback = document.querySelector('.feedback');\n  const formControl = document.querySelector('.form-control');\n  const i18nextInstance1 = (0,_locales_locales_js__WEBPACK_IMPORTED_MODULE_2__[\"default\"])();\n\n  const renderErrors = () => {\n    const [error] = state.errors;\n    formControl.classList.add('is-invalid');\n    feedback.classList.remove('text-success');\n    feedback.classList.add('text-danger');\n    feedback.textContent = error;\n  };\n\n  const renderLinks = () => {\n    const form = document.querySelector('.rss-form');\n    const inputform = form.elements[0];\n    feedback.classList.remove('text-danger');\n    feedback.classList.add('text-success');\n    feedback.textContent = i18nextInstance1.t('key');\n    inputform.value = '';\n    inputform.focus();\n  };\n  const renderPostsContainer = () => {\n    const cardPosts = document.createElement('div');\n    cardPosts.className = 'card border-0';\n    cardPosts.setAttribute('id', 'cardPosts');\n    const cardBody = document.createElement('div');\n    cardBody.className = 'card-body';\n    const postName = document.createElement('h2');\n    postName.className = 'card-title m4';\n    postName.textContent = i18nextInstance1.t('posts');\n    cardPosts.append(cardBody);\n    cardBody.append(postName);\n    const postsEl = document.querySelector('.posts');\n    postsEl.append(cardPosts);\n  };\n\n  const renderFeedsConstainer = () => {\n    const cardFeeds = document.createElement('div');\n    cardFeeds.setAttribute('id', 'cardFeeds');\n    cardFeeds.className = 'card border-0';\n    const cardBodyFeed = document.createElement('div');\n    cardBodyFeed.className = 'card-body';\n    const feedName = document.createElement('h2');\n    feedName.className = 'card-title h4';\n    feedName.textContent = i18nextInstance1.t('feeds');\n    cardFeeds.append(cardBodyFeed);\n    cardBodyFeed.append(feedName);\n    const feedsEl = document.querySelector('.feeds');\n    feedsEl.append(cardFeeds);\n  };\n\n  const renderPosts = (posts) => {\n    posts.map((post) => {\n      const cardPosts = document.getElementById('cardPosts');\n      const ul = document.createElement('ul');\n      ul.className = 'list-group border-0 rounded-0';\n      const li = document.createElement('li');\n      li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';\n      const a = document.createElement('a');\n      a.className = 'fw-bold';\n      a.setAttribute('rel', 'noopener noreferrer');\n      a.setAttribute('target', '_blank');\n      a.setAttribute('href', `${post.href}`);\n      a.setAttribute('data-id', `${post['data-id']}`);\n      a.textContent = `${post.title}`;\n      const btn = document.createElement('button');\n      btn.setAttribute('type', 'button');\n      btn.className = 'btn btn-outline-primary btn-sm';\n      btn.setAttribute('data-id', `${post['data-id']}`);\n      btn.setAttribute('data-bs-toggle', 'modal');\n      btn.setAttribute('data-bs-target', '#modal');\n      btn.textContent = i18nextInstance1.t('btnView');\n      li.prepend(a);\n      li.append(btn);\n      ul.append(li);\n      cardPosts.append(ul);\n    });\n  };\n  const renderFeeds = (promise) => {\n    const feedDescription = promise.querySelector('description').textContent;\n    const feedTitle = promise.querySelector('title').textContent;\n    const cardFeeds = document.getElementById('cardFeeds');\n    const feeds1 = document.querySelector('.feeds');\n    const ulFeeds = document.createElement('ul');\n    ulFeeds.className = 'list-group border-0 rounded-0';\n    const listFeed = document.createElement('li');\n    listFeed.className = 'list-group-item border-0 border-end-0';\n    const feedChanell = document.createElement('h3');\n    feedChanell.className = 'h6 m-0';\n    feedChanell.textContent = feedTitle;\n    const feedsDescription = document.createElement('p');\n    feedsDescription.textContent = feedDescription;\n    feedsDescription.className = 'm-0 small text-black-50';\n    listFeed.prepend(feedChanell);\n    listFeed.append(feedsDescription);\n    ulFeeds.append(listFeed);\n    cardFeeds.append(ulFeeds);\n    feeds1.append(cardFeeds);\n  };\n  const renderRSS = (promise) => {\n    if (state) { renderLinks(); }\n    const items = Array.from(promise.querySelectorAll('item'));\n    const posts = items.map((item) => {\n      const id = lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default()();\n      const title = item.querySelector('title').textContent;\n      const link = item.querySelector('link').textContent;\n      const description = item.querySelector('description').textContent;\n      return {\n        'data-id': id,\n        href: link,\n        title,\n        description,\n      };\n    });\n    renderPosts(posts);\n\n    const ul = document.createElement('ul');\n    ul.className = 'list-group border-0 rounded-0';\n    const li = document.createElement('li');\n    li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';\n    const a = document.createElement('a');\n    a.className = 'fw-bold';\n    a.setAttribute('data-id', '');\n    const btn = document.createElement('button');\n    btn.setAttribute('type', 'button');\n    btn.className = 'btn btn-outline-primary btn-sm';\n  };\n\n  const watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(state, (path, value) => {\n    console.log(state);\n    console.log(value);\n    switch (path) {\n      case 'urlLinks':\n        const [data] = value;\n        if (state.urlLinks.length === 1) {\n          renderPostsContainer();\n          renderFeedsConstainer();\n        }\n        const promises = state.urlLinks.map((link) => {\n          console.log(link);\n          const prom = (0,_parsing_js__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(link);\n          return prom;\n        });\n        const promise = Promise.all(promises);\n        console.log(promise);\n\n        (0,_parsing_js__WEBPACK_IMPORTED_MODULE_3__[\"default\"])(data).then((x) => renderFeeds(x));\n        setTimeout(function run() {\n          promise.then((contents) => contents.map((content) => renderRSS(content)));\n          setTimeout(run, 5000);\n        }, 0);\n        break;\n      case 'errors':\n        renderErrors();\n        break;\n      default:\n        break;\n    }\n  });\n  return watchedState;\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (foo);\n\n\n//# sourceURL=webpack://@hexlet/code/./src/view.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var on_change__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! on-change */ \"./node_modules/on-change/index.js\");\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lodash/uniqueId.js */ \"./node_modules/lodash/uniqueId.js\");\n/* harmony import */ var lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var lodash_differenceBy_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lodash/differenceBy.js */ \"./node_modules/lodash/differenceBy.js\");\n/* harmony import */ var lodash_differenceBy_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(lodash_differenceBy_js__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _locales_locales_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./locales/locales.js */ \"./src/locales/locales.js\");\n/* harmony import */ var _parsing_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./parsing.js */ \"./src/parsing.js\");\n// BEGIN\n\n\n\n\n\n\nconst foo = (state) => {\n  const feedback = document.querySelector('.feedback');\n  const formControl = document.querySelector('.form-control');\n  const i18nextInstance1 = (0,_locales_locales_js__WEBPACK_IMPORTED_MODULE_3__[\"default\"])();\n\n  const renderErrors = () => {\n    const [error] = state.errors;\n    formControl.classList.add('is-invalid');\n    feedback.classList.remove('text-success');\n    feedback.classList.add('text-danger');\n    feedback.textContent = error;\n  };\n\n  const renderLinks = () => {\n    const form = document.querySelector('.rss-form');\n    const inputform = form.elements[0];\n    feedback.classList.remove('text-danger');\n    feedback.classList.add('text-success');\n    feedback.textContent = i18nextInstance1.t('key');\n    inputform.value = '';\n    inputform.focus();\n  };\n  const renderPostsContainer = () => {\n    const cardPosts = document.createElement('div');\n    cardPosts.className = 'card border-0';\n    cardPosts.setAttribute('id', 'cardPosts');\n    const cardBody = document.createElement('div');\n    cardBody.className = 'card-body';\n    const postName = document.createElement('h2');\n    postName.className = 'card-title m4';\n    postName.textContent = i18nextInstance1.t('posts');\n    cardPosts.append(cardBody);\n    cardBody.append(postName);\n    const postsEl = document.querySelector('.posts');\n    postsEl.append(cardPosts);\n  };\n\n  const renderFeedsConstainer = () => {\n    const cardFeeds = document.createElement('div');\n    cardFeeds.setAttribute('id', 'cardFeeds');\n    cardFeeds.className = 'card border-0';\n    const cardBodyFeed = document.createElement('div');\n    cardBodyFeed.className = 'card-body';\n    const feedName = document.createElement('h2');\n    feedName.className = 'card-title h4';\n    feedName.textContent = i18nextInstance1.t('feeds');\n    cardFeeds.append(cardBodyFeed);\n    cardBodyFeed.append(feedName);\n    const feedsEl = document.querySelector('.feeds');\n    feedsEl.append(cardFeeds);\n  };\n\n  const renderPosts = (posts) => {\n    posts.map((post) => {\n      const cardPosts = document.getElementById('cardPosts');\n      const ul = document.createElement('ul');\n      ul.className = 'list-group border-0 rounded-0';\n      const li = document.createElement('li');\n      li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';\n      const a = document.createElement('a');\n      a.className = 'fw-bold';\n      a.setAttribute('rel', 'noopener noreferrer');\n      a.setAttribute('target', '_blank');\n      a.setAttribute('href', `${post.href}`);\n      a.setAttribute('data-id', `${post['data-id']}`);\n      a.textContent = `${post.title}`;\n      const btn = document.createElement('button');\n      btn.setAttribute('type', 'button');\n      btn.className = 'btn btn-outline-primary btn-sm';\n      btn.setAttribute('data-id', `${post['data-id']}`);\n      btn.setAttribute('data-bs-toggle', 'modal');\n      btn.setAttribute('data-bs-target', '#modal');\n      btn.textContent = i18nextInstance1.t('btnView');\n      li.prepend(a);\n      li.append(btn);\n      ul.append(li);\n      cardPosts.append(ul);\n    });\n  };\n  const renderFeeds = (feeds) => {\n    feeds.forEach((feed) => {\n      const { feedDescription } = feed;\n      const { feedTitle } = feed;\n      const cardFeeds = document.getElementById('cardFeeds');\n      const feeds1 = document.querySelector('.feeds');\n      const ulFeeds = document.createElement('ul');\n      ulFeeds.className = 'list-group border-0 rounded-0';\n      const listFeed = document.createElement('li');\n      listFeed.className = 'list-group-item border-0 border-end-0';\n      const feedChanell = document.createElement('h3');\n      feedChanell.className = 'h6 m-0';\n      feedChanell.textContent = feedTitle;\n      const feedsDescription = document.createElement('p');\n      feedsDescription.textContent = feedDescription;\n      feedsDescription.className = 'm-0 small text-black-50';\n      listFeed.prepend(feedChanell);\n      listFeed.append(feedsDescription);\n      ulFeeds.append(listFeed);\n      cardFeeds.append(ulFeeds);\n      feeds1.append(cardFeeds);\n    });\n  };\n  const renderRSS = (promise) => {\n    state.posts.push('!!!!DDDD');\n    if (state) { renderLinks(); }\n    const items = Array.from(promise.querySelectorAll('item'));\n    const posts = items.map((item) => {\n      const id = lodash_uniqueId_js__WEBPACK_IMPORTED_MODULE_1___default()();\n      const title = item.querySelector('title').textContent;\n      const link = item.querySelector('link').textContent;\n      const description = item.querySelector('description').textContent;\n      return {\n        'data-id': id,\n        href: link,\n        title,\n        description,\n      };\n    });\n    renderPosts(posts);\n\n    const ul = document.createElement('ul');\n    ul.className = 'list-group border-0 rounded-0';\n    const li = document.createElement('li');\n    li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';\n    const a = document.createElement('a');\n    a.className = 'fw-bold';\n    a.setAttribute('data-id', '');\n    const btn = document.createElement('button');\n    btn.setAttribute('type', 'button');\n    btn.className = 'btn btn-outline-primary btn-sm';\n  };\n\n  const watchedState = (0,on_change__WEBPACK_IMPORTED_MODULE_0__[\"default\"])(state, (path, value) => {\n    switch (path) {\n      case 'urlLinks':\n        renderPostsContainer();\n        renderFeedsConstainer();\n\n        const [data] = value;\n        (0,_parsing_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(data)\n          .then(([feed, posts]) => {\n           \n            watchedState.posts.push(...posts);\n            watchedState.feeds.push(...feed);\n          });\n        console.log(state);\n        setTimeout(function run() {\n          (0,_parsing_js__WEBPACK_IMPORTED_MODULE_4__[\"default\"])(data)\n            .then(([feed, posts]) => {\n              const newfeeds = lodash_differenceBy_js__WEBPACK_IMPORTED_MODULE_2___default()(feed, state.feed, 'feedDescription');\n              if (newfeeds.length !== 0) {\n                watchedState.feeds.push(...newfeeds);\n              }\n              const newPosts = lodash_differenceBy_js__WEBPACK_IMPORTED_MODULE_2___default()(posts, state.posts, 'href');\n              console.log(newPosts);\n              watchedState.posts.push(...newPosts);\n            });\n\n          setTimeout(run, 5000);\n        }, 0);\n        /* watchedState.posts.push(posts);\n         watchedState.feeds.push(feed); */\n        /* if (state.urlLinks.length === 1) {\n          renderPostsContainer();\n          renderFeedsConstainer();\n        }\n        const promises = state.urlLinks.map((link) => {\n          console.log(link);\n          const prom = parsing(link);\n          return prom;\n        });\n        const promise = Promise.all(promises);\n        console.log(promise);\n\n        parsing(data).then((x) => renderFeeds(x));\n        setTimeout(function run() {\n          promise.then((contents) => contents.map((content) => renderRSS(content)));\n          setTimeout(run, 5000);\n        }, 0); */\n        break;\n      case 'errors':\n        renderErrors();\n        break;\n      case 'posts':\n        renderPosts(state.posts);\n        break;\n      case 'feeds':\n        renderFeeds(state.feeds);\n        break;\n      default:\n        break;\n    }\n  });\n  return watchedState;\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (foo);\n\n\n//# sourceURL=webpack://@hexlet/code/./src/view.js?");
 
 /***/ }),
 
