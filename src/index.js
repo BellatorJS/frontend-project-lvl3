@@ -12,6 +12,10 @@ const state = {
   feeds: [],
   posts: [],
   errors: [],
+  uiState: {
+    modals: [],
+  },
+
 };
 
 const watchedState = foo(state);
@@ -19,6 +23,13 @@ const watchedState = foo(state);
 const i18nextInstance1 = runI18();
 
 const form = document.querySelector('.rss-form');
+const posts = document.querySelector('.posts');
+
+posts.addEventListener('click', (e) => {
+  const { target } = e;
+  const id = target.getAttribute('data-id');
+  watchedState.uiState.modals.push(id);
+});
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -44,7 +55,7 @@ form.addEventListener('submit', (e) => {
     })
     .catch((err) => {
       const [error] = err.errors;
-      console.log(error)
+      console.log(error);
       watchedState.errors.push(error);
     });
 });

@@ -20,6 +20,19 @@ const foo = (state) => {
     state.errors = [];
   };
 
+  const renderModals = (ElemsId, posts) => {
+    ElemsId.forEach((id) => {
+      const post = posts.find((data) => data['data-id'] == id);
+      const tit = document.querySelector('.modal-title');
+      tit.textContent = post.description;
+      post.href;
+      post.title;
+      post.description;
+      console.log('FIND');
+      console.log(post);
+    });
+  };
+
   const renderLinks = () => {
     const form = document.querySelector('.rss-form');
     const inputform = form.elements[0];
@@ -146,10 +159,12 @@ const foo = (state) => {
         renderErrors(state.errors);
         break;
       case 'posts':
-        // renderPosts(state.posts);
         break;
       case 'feeds':
-        // renderFeeds(state.feeds);
+        break;
+      case 'uiState.modals':
+        console.log(state.uiState.modals);
+        renderModals(state.uiState.modals, state.posts);
         break;
       default:
         break;
