@@ -140,58 +140,41 @@ const foo = (state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'urlLinks':
-        renderPostsContainer();
-        renderFeedsConstainer();
-
-        const [data] = value;
-        parsing(data)
-          .then(([feed, posts]) => {
-            watchedState.posts.push(...posts);
-            watchedState.feeds.push(...feed);
-          });
-        console.log(state);
-        setTimeout(function run() {
-          parsing(data)
-            .then(([feed, posts]) => {
-              const newFeeds = differenceBy(feed, state.feed, 'feedDescription');
-              if (newFeeds.length !== 0) {
-                watchedState.feeds.push(...newFeeds);
-              }
-              const newPosts = differenceBy(posts, state.posts, 'href');
-              console.log(newPosts);
-              watchedState.posts.push(...newPosts);
-            });
-
-          setTimeout(run, 5000);
-        }, 0);
-        /* watchedState.posts.push(posts);
-         watchedState.feeds.push(feed); */
-        /* if (state.urlLinks.length === 1) {
+        if (state.urlLinks.length === 1) {
           renderPostsContainer();
           renderFeedsConstainer();
         }
-        const promises = state.urlLinks.map((link) => {
-          console.log(link);
-          const prom = parsing(link);
-          return prom;
-        });
-        const promise = Promise.all(promises);
-        console.log(promise);
-
-        parsing(data).then((x) => renderFeeds(x));
+        console.log(state);
         setTimeout(function run() {
-          promise.then((contents) => contents.map((content) => renderRSS(content)));
+          const promises = state.urlLinks.map((link) => parsing(link));
+          const promise = Promise.all(promises);
+          promise
+            .then((contents) => contents.forEach(([feed, posts]) => {
+              const newPosts = differenceBy(posts, state.posts, 'href');
+              if (newPosts.length !== 0) {
+                console.log(state.posts);
+                renderPosts(newPosts);
+                watchedState.posts.push(...newPosts);
+              }
+              const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
+
+              if (newFeeds.length !== 0) {
+                console.log(newFeeds);
+                renderFeeds(newFeeds);
+                watchedState.feeds.push(...newFeeds);
+              }
+            }));
           setTimeout(run, 5000);
-        }, 0); */
+        }, 0);
         break;
       case 'errors':
         renderErrors();
         break;
       case 'posts':
-        renderPosts(state.posts);
+        // renderPosts(state.posts);
         break;
       case 'feeds':
-        renderFeeds(state.feeds);
+        // renderFeeds(state.feeds);
         break;
       default:
         break;

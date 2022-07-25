@@ -16,7 +16,7 @@ const getParsingDatas = (promise) => {
   feedContainer.push(feedContent);
   // if (state) { renderLinks(); }
   const items = Array.from(promise.querySelectorAll('item'));
- const posts = items.map((post) => {
+  const posts = items.map((post) => {
     const id = uniqueId();
     const title = post.querySelector('title').textContent;
     const link = post.querySelector('link').textContent;
