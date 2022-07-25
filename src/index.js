@@ -44,7 +44,7 @@ form.addEventListener('submit', (e) => {
     })
     .catch((err) => {
       const [error] = err.errors;
+      console.log(error)
       watchedState.errors.push(error);
     });
-  state.errors = [];
 });

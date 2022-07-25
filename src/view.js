@@ -10,12 +10,14 @@ const foo = (state) => {
   const formControl = document.querySelector('.form-control');
   const i18nextInstance1 = runI18();
 
-  const renderErrors = () => {
-    const [error] = state.errors;
-    formControl.classList.add('is-invalid');
-    feedback.classList.remove('text-success');
-    feedback.classList.add('text-danger');
-    feedback.textContent = error;
+  const renderErrors = (errors) => {
+    errors.forEach((error) => {
+      formControl.classList.add('is-invalid');
+      feedback.classList.remove('text-success');
+      feedback.classList.add('text-danger');
+      feedback.textContent = error;
+    });
+    state.errors = [];
   };
 
   const renderLinks = () => {
@@ -58,7 +60,7 @@ const foo = (state) => {
   };
 
   const renderPosts = (posts) => {
-    posts.map((post) => {
+    posts.forEach((post) => {
       const cardPosts = document.getElementById('cardPosts');
       const ul = document.createElement('ul');
       ul.className = 'list-group border-0 rounded-0';
@@ -107,39 +109,11 @@ const foo = (state) => {
       feeds1.append(cardFeeds);
     });
   };
-  const renderRSS = (promise) => {
-    state.posts.push('!!!!DDDD');
-    if (state) { renderLinks(); }
-    const items = Array.from(promise.querySelectorAll('item'));
-    const posts = items.map((item) => {
-      const id = uniqueId();
-      const title = item.querySelector('title').textContent;
-      const link = item.querySelector('link').textContent;
-      const description = item.querySelector('description').textContent;
-      return {
-        'data-id': id,
-        href: link,
-        title,
-        description,
-      };
-    });
-    renderPosts(posts);
-
-    const ul = document.createElement('ul');
-    ul.className = 'list-group border-0 rounded-0';
-    const li = document.createElement('li');
-    li.className = 'list-group-item d-flex justify-content-between align-items-start border-0 border-end-0';
-    const a = document.createElement('a');
-    a.className = 'fw-bold';
-    a.setAttribute('data-id', '');
-    const btn = document.createElement('button');
-    btn.setAttribute('type', 'button');
-    btn.className = 'btn btn-outline-primary btn-sm';
-  };
 
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'urlLinks':
+        renderLinks();
         if (state.urlLinks.length === 1) {
           renderPostsContainer();
           renderFeedsConstainer();
@@ -163,12 +137,13 @@ const foo = (state) => {
                 renderFeeds(newFeeds);
                 watchedState.feeds.push(...newFeeds);
               }
-            }));
+            }))
+            .catch(() => watchedState.errors.push(i18nextInstance1.t('errorNetWork')));
           setTimeout(run, 5000);
         }, 0);
         break;
       case 'errors':
-        renderErrors();
+        renderErrors(state.errors);
         break;
       case 'posts':
         // renderPosts(state.posts);

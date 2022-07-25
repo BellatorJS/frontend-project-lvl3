@@ -12,6 +12,7 @@ const runI18 = () => {
           errorURL: 'Ссылка должна быть валидным URL',
           errorRepeat: 'RSS уже существует',
           errorParsing: 'Ресурс не содержит валидный RSS',
+          errorNetWork: 'Ошибка сети',
           btnAdd: 'Добавить',
           btnView: 'Просмотр',
           posts: 'Посты',
