@@ -164,6 +164,7 @@ const foo = (state) => {
               if (errorName === 'AxiosError') {
                 watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
               }
+              watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
             });
           setTimeout(run, 5000);
         }, 0);
