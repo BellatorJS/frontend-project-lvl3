@@ -133,12 +133,20 @@ const foo = (state) => {
       case 'urlLinks':
         console.log(state);
         setTimeout(function run() {
-          const promises = state.urlLinks.map((link) => parsing(link));
+          const promises = state.urlLinks.map((link) => parsing(link)
+            .catch((err) => {
+              const errorName = err.name;
+              if (errorName === 'TypeError') {
+                watchedState.errors.push(i18nextInstance1.t('errorParsing'));
+              }
+              if (errorName === 'AxiosError') {
+                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
+              }
+            }));
           const promise = Promise.all(promises);
           promise
             .then((contents) => contents.forEach(([feed, posts]) => {
               const newPosts = differenceBy(posts, state.posts, 'href');
-              
               if (state.urlLinks.length === 1) {
                 renderPostsContainer();
               }
