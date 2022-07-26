@@ -138,7 +138,7 @@ const foo = (state) => {
           promise
             .then((contents) => contents.forEach(([feed, posts]) => {
               const newPosts = differenceBy(posts, state.posts, 'href');
-              renderLinks();
+              
               if (state.urlLinks.length === 1) {
                 renderPostsContainer();
               }
@@ -157,6 +157,7 @@ const foo = (state) => {
                 renderFeeds(newFeeds);
                 watchedState.feeds.push(...newFeeds);
               }
+              renderLinks();
             }))
             .catch((err) => {
               const errorName = err.name;
