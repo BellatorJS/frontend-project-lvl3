@@ -156,7 +156,15 @@ const foo = (state) => {
                 watchedState.feeds.push(...newFeeds);
               }
             }))
-            .catch(() => watchedState.errors.push(i18nextInstance1.t('errorNetWork')));
+            .catch((err) => {
+              const errorName = err.name;
+              if (errorName === 'TypeError') {
+                watchedState.errors.push(i18nextInstance1.t('errorParsing'));
+              }
+              if (errorName !== 'TypeError') {
+                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
+              }
+            });
           setTimeout(run, 5000);
         }, 0);
         break;

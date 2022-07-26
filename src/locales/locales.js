@@ -3,7 +3,7 @@ import i18next from 'i18next';
 const runI18 = () => {
   const i18nextInstance = i18next.createInstance();
   i18nextInstance.init({
-    lng: 'ru',
+    lng: 'ru', // Текущий язык
     debug: true,
     resources: {
       ru: {

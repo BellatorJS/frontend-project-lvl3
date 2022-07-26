@@ -41,7 +41,7 @@ function parsing(rssLink) {
     .then((response) => response.data.contents)
     .then((response1) => parsingHtml(response1))
     .then((data) => getParsingDatas(data))
-    .catch((error) => error.config);
+    .catch((error) => console.log(error.name));
   return result;
 }
 
