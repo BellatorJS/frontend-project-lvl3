@@ -1,6 +1,5 @@
 // BEGIN
 import onChange from 'on-change';
-import uniqueId from 'lodash/uniqueId.js';
 import differenceBy from 'lodash/differenceBy.js';
 import runI18 from './locales/locales.js';
 import parsing from './parsing.js';
@@ -17,19 +16,25 @@ const foo = (state) => {
       feedback.classList.add('text-danger');
       feedback.textContent = error;
     });
+    // eslint-disable-next-line no-param-reassign
     state.errors = [];
   };
 
   const renderModals = (ElemsId, posts) => {
     ElemsId.forEach((id) => {
-      const post = posts.find((data) => data['data-id'] == id);
-      const tit = document.querySelector('.modal-title');
-      tit.textContent = post.description;
-      post.href;
-      post.title;
-      post.description;
-      console.log('FIND');
-      console.log(post);
+      const post = posts.find((data) => data['data-id'] === id);
+      console.log();
+      const title = document.querySelector('.modal-title');
+      title.textContent = post.title;
+      i18nextInstance1.t('errorRepeat');
+      const description = document.querySelector('.text-break');
+      description.textContent = post.description;
+      const linkBtn = document.querySelector('.full-article');
+      linkBtn.setAttribute('href', post.href);
+      const element = document.querySelector(`[data-id='${id}']`);
+      console.log(element);
+      element.classList.remove('fw-bold');
+      element.classList.add('fw-normal');
     });
   };
 
@@ -123,7 +128,7 @@ const foo = (state) => {
     });
   };
 
-  const watchedState = onChange(state, (path, value) => {
+  const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'urlLinks':
         renderLinks();

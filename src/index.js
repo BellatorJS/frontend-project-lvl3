@@ -1,11 +1,9 @@
 import 'bootstrap';
 import './scss/_custom.scss';
 import * as yup from 'yup';
-import i18next from 'i18next';
 import { setLocale } from 'yup';
 import foo from './view.js';
 import runI18 from './locales/locales.js';
-import parsing from './parsing.js';
 
 const state = {
   urlLinks: [],
