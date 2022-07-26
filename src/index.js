@@ -37,6 +37,7 @@ form.addEventListener('submit', (e) => {
   setLocale({
     string: {
       url: i18nextInstance1.t('errorURL'),
+      matches: i18nextInstance1.t('errorURL'),
     },
     mixed: {
       notOneOf: i18nextInstance1.t('errorRepeat'),
@@ -53,10 +54,6 @@ form.addEventListener('submit', (e) => {
     })
     .catch((err) => {
       const [error] = err.errors;
-      console.log(error);
-      if (error === 'url must match the following: "/(rss)/"') {
-        watchedState.errors.push(i18nextInstance1.t('errorURL'));
-      }
-      watchedState.errors.push(i18nextInstance1.t('errorURL'));
+      watchedState.errors.push(i18nextInstance1.t(error));
     });
 });
