@@ -161,7 +161,7 @@ const foo = (state) => {
               if (errorName === 'TypeError') {
                 watchedState.errors.push(i18nextInstance1.t('errorParsing'));
               }
-              if (errorName !== 'TypeError') {
+              if (errorName === 'AxiosError') {
                 watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
               }
             });
