@@ -131,11 +131,6 @@ const foo = (state) => {
   const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'urlLinks':
-        renderLinks();
-        if (state.urlLinks.length === 1) {
-          renderPostsContainer();
-          renderFeedsConstainer();
-        }
         console.log(state);
         setTimeout(function run() {
           const promises = state.urlLinks.map((link) => parsing(link));
@@ -143,12 +138,19 @@ const foo = (state) => {
           promise
             .then((contents) => contents.forEach(([feed, posts]) => {
               const newPosts = differenceBy(posts, state.posts, 'href');
+              renderLinks();
+              if (state.urlLinks.length === 1) {
+                renderPostsContainer();
+              }
               if (newPosts.length !== 0) {
                 console.log(state.posts);
                 renderPosts(newPosts);
                 watchedState.posts.push(...newPosts);
               }
               const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
+              if (state.urlLinks.length === 1) {
+                renderFeedsConstainer();
+              }
 
               if (newFeeds.length !== 0) {
                 console.log(newFeeds);
