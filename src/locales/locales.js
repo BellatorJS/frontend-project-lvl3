@@ -3,7 +3,7 @@ import i18next from 'i18next';
 const runI18 = () => {
   const i18nextInstance = i18next.createInstance();
   i18nextInstance.init({
-    lng: 'ru', // Текущий язык
+    lng: 'ru',
     debug: true,
     resources: {
       ru: {
@@ -28,8 +28,6 @@ const runI18 = () => {
 
   })
     .then((t) => { t('key'); });
-
-  // инициализированный экземпляр необходимо передать в приложение
   return i18nextInstance;
 };
 export default runI18;

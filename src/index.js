@@ -44,7 +44,7 @@ form.addEventListener('submit', (e) => {
   });
 
   const schema = yup.object().shape({
-    url: yup.string().url().notOneOf(state.urlLinks),
+    url: yup.string().matches(/(rss)/).url().notOneOf(state.urlLinks),
   });
 
   schema.validate(formDates)
@@ -54,6 +54,9 @@ form.addEventListener('submit', (e) => {
     .catch((err) => {
       const [error] = err.errors;
       console.log(error);
-      watchedState.errors.push(error);
+      if (error === 'url must match the following: "/(rss)/"') {
+        watchedState.errors.push(i18nextInstance1.t('errorURL'));
+      }
+      watchedState.errors.push(i18nextInstance1.t('errorURL'));
     });
 });
