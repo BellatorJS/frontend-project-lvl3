@@ -6,6 +6,7 @@ import foo from './view.js';
 import runI18 from './locales/locales.js';
 
 const state = {
+  runApp: false,
   urlLinks: [],
   feeds: [],
   posts: [],

@@ -150,8 +150,9 @@ const foo = (state) => {
           promise
             .then((contents) => contents.forEach(([feed, posts]) => {
               const newPosts = differenceBy(posts, state.posts, 'href');
-              if (state.urlLinks.length === 1) {
-                renderPostsContainer();
+              if (state.runApp == false) {
+
+                watchedState.runApp = true;
               }
               if (newPosts.length !== 0) {
                 console.log(state.posts);
@@ -159,9 +160,6 @@ const foo = (state) => {
                 watchedState.posts.push(...newPosts);
               }
               const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
-              if (state.urlLinks.length === 1) {
-                renderFeedsConstainer();
-              }
 
               if (newFeeds.length !== 0) {
                 console.log(newFeeds);
@@ -193,6 +191,11 @@ const foo = (state) => {
       case 'posts':
         break;
       case 'feeds':
+        break;
+      case 'runApp':
+        console.log("RRRUUUNNN")
+        renderFeedsConstainer();
+        renderPostsContainer();
         break;
       case 'uiState.modals':
         console.log(state.uiState.modals);
