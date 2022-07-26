@@ -128,12 +128,14 @@ const foo = (state) => {
     });
   };
 
-  const watchedState = onChange(state, (path) => {
+  const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'urlLinks':
-        console.log(state);
+        console.log(state.urlLinks);
+        const [link] = value;
+        console.log(link);
         setTimeout(function run() {
-          const promises = state.urlLinks.map((link) => parsing(link)
+          const promises = state.urlLinks.map((link1) => parsing(link1)
             .catch((err) => {
               const errorName = err.name;
               if (errorName === 'TypeError') {
@@ -142,6 +144,7 @@ const foo = (state) => {
               if (errorName === 'AxiosError') {
                 watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
               }
+              watchedState.errors.push(i18nextInstance1.t('errorParsing'));
             }));
           const promise = Promise.all(promises);
           promise
@@ -171,6 +174,8 @@ const foo = (state) => {
               const errorName = err.name;
               if (errorName === 'TypeError') {
                 watchedState.errors.push(i18nextInstance1.t('errorParsing'));
+                watchedState.urlLinks = watchedState.urlLinks.filter((x) => x !== link);
+                console.log('AAAA');
               }
               if (errorName === 'AxiosError') {
                 watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
@@ -180,7 +185,9 @@ const foo = (state) => {
         }, 0);
         break;
       case 'errors':
+
         renderErrors(state.errors);
+
         break;
       case 'posts':
         break;
