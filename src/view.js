@@ -1,6 +1,7 @@
 // BEGIN
 import onChange from 'on-change';
 import differenceBy from 'lodash/differenceBy.js';
+import { result } from 'lodash';
 import runI18 from './locales/locales.js';
 import parsing from './parsing.js';
 
@@ -135,8 +136,50 @@ const foo = (state) => {
         const [link] = value;
         console.log(link);
         setTimeout(function run() {
+          const promises = state.urlLinks.map((link1) => parsing(link1));
+          const promise = Promise.all(promises);
+          promise
+            .then((contents) => {
+              console.log(contents);
+              if (contents[0] === 'TypeError') {
+                console.log('AAAA');
+                watchedState.errors.push(i18nextInstance1.t('errorParsing'));
+                return watchedState.urlLinks = watchedState.urlLinks.filter((x) => x !== link);
+              }
+              if (contents[0] === 'AxiosError') {
+                console.log('Я здесь');
+                return watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
+              }
+              return contents.forEach(([feed, posts]) => {
+                const newPosts = differenceBy(posts, state.posts, 'href');
+                if (state.runApp == false) {
+                  console.log(state.runApp);
+                  watchedState.runApp = true;
+                }
+                if (newPosts.length !== 0) {
+                  console.log(state.posts);
+                  renderPosts(newPosts);
+                  watchedState.posts.push(...newPosts);
+                }
+                const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
+
+                if (newFeeds.length !== 0) {
+                  console.log(newFeeds);
+                  renderFeeds(newFeeds);
+                  watchedState.feeds.push(...newFeeds);
+                }
+                renderLinks();
+              });
+            });
+
+          setTimeout(run, 1000);
+        }, 0);
+
+        // .then((x) => console.log(x)));
+        /* setTimeout(function run() {
           const promises = state.urlLinks.map((link1) => parsing(link1)
             .catch((err) => {
+              console.log(err)
               const errorName = err.name;
               if (errorName === 'TypeError') {
                 watchedState.errors.push(i18nextInstance1.t('errorParsing'));
@@ -145,13 +188,13 @@ const foo = (state) => {
                 watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
               }
               watchedState.errors.push(i18nextInstance1.t('errorParsing'));
-            }));
+            }));/*
           const promise = Promise.all(promises);
           promise
             .then((contents) => contents.forEach(([feed, posts]) => {
               const newPosts = differenceBy(posts, state.posts, 'href');
               if (state.runApp == false) {
-
+                console.log(state.runApp);
                 watchedState.runApp = true;
               }
               if (newPosts.length !== 0) {
@@ -171,7 +214,7 @@ const foo = (state) => {
             .catch((err) => {
               const errorName = err.name;
               if (errorName === 'TypeError') {
-                watchedState.errors.push(i18nextInstance1.t('errorParsing'));
+                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
                 watchedState.urlLinks = watchedState.urlLinks.filter((x) => x !== link);
                 console.log('AAAA');
               }
@@ -181,10 +224,10 @@ const foo = (state) => {
               watchedState.errors.push(i18nextInstance1.t('errorParsing'));
             });
           setTimeout(run, 5000);
-        }, 0);
+        }, 0); */
         break;
       case 'errors':
-
+        console.log(state.errors);
         renderErrors(state.errors);
 
         break;
@@ -193,7 +236,7 @@ const foo = (state) => {
       case 'feeds':
         break;
       case 'runApp':
-        console.log("RRRUUUNNN")
+        console.log('RRRUUUNNN');
         renderFeedsConstainer();
         renderPostsContainer();
         break;

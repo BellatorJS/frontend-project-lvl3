@@ -41,7 +41,13 @@ function parsing(rssLink) {
     .then((response) => response.data.contents)
     .then((response1) => parsingHtml(response1))
     .then((data) => getParsingDatas(data))
-    .catch((error) => console.log(error.name));
+    .catch((error) => {
+      const errorName = error.name;
+      if (errorName === 'TypeError') {
+        return 'TypeError';
+      }
+      return 'AxiosError';
+    });
   return result;
 }
 
