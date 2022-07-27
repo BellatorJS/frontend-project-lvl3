@@ -1,7 +1,6 @@
 // BEGIN
 import onChange from 'on-change';
 import differenceBy from 'lodash/differenceBy.js';
-
 import runI18 from './locales/locales.js';
 import parsing from './parsing.js';
 
@@ -24,7 +23,6 @@ const foo = (state) => {
   const renderModals = (ElemsId, posts) => {
     ElemsId.forEach((id) => {
       const post = posts.find((data) => data['data-id'] === id);
-      console.log();
       const title = document.querySelector('.modal-title');
       title.textContent = post.title;
       i18nextInstance1.t('errorRepeat');
@@ -33,7 +31,6 @@ const foo = (state) => {
       const linkBtn = document.querySelector('.full-article');
       linkBtn.setAttribute('href', post.href);
       const element = document.querySelector(`[data-id='${id}']`);
-      console.log(element);
       element.classList.remove('fw-bold');
       element.classList.add('fw-normal');
     });
@@ -132,116 +129,51 @@ const foo = (state) => {
   const watchedState = onChange(state, (path, value) => {
     switch (path) {
       case 'urlLinks':
-        console.log(state.urlLinks);
-        // const [link] = value;
-        // console.log(link);
         setTimeout(function run() {
-          const promises = state.urlLinks.map((link1) => parsing(link1));
+          const promises = state.urlLinks.map((link) => parsing(link));
           const promise = Promise.all(promises);
           promise
             .then((contents) => {
-              console.log(contents);
               if (contents[0] === 'TypeError') {
-                console.log('AAAA');
                 watchedState.errors.push(i18nextInstance1.t('errorParsing'));
                 return watchedState.urlLinks.filter((x) => x !== value[0]);
               }
               if (contents[0] === 'AxiosError') {
-                console.log('Я здесь');
                 return watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
               }
               return contents.forEach(([feed, posts]) => {
                 const newPosts = differenceBy(posts, state.posts, 'href');
                 if (state.runApp === false) {
-                  console.log(state.runApp);
                   watchedState.runApp = true;
                 }
                 if (newPosts.length !== 0) {
-                  console.log(state.posts);
                   renderPosts(newPosts);
                   watchedState.posts.push(...newPosts);
                 }
                 const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
 
                 if (newFeeds.length !== 0) {
-                  console.log(newFeeds);
                   renderFeeds(newFeeds);
                   watchedState.feeds.push(...newFeeds);
                 }
                 renderLinks();
               });
             });
-
           setTimeout(run, 5000);
         }, 0);
-
-        // .then((x) => console.log(x)));
-        /* setTimeout(function run() {
-          const promises = state.urlLinks.map((link1) => parsing(link1)
-            .catch((err) => {
-              console.log(err)
-              const errorName = err.name;
-              if (errorName === 'TypeError') {
-                watchedState.errors.push(i18nextInstance1.t('errorParsing'));
-              }
-              if (errorName === 'AxiosError') {
-                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
-              }
-              watchedState.errors.push(i18nextInstance1.t('errorParsing'));
-            }));/*
-          const promise = Promise.all(promises);
-          promise
-            .then((contents) => contents.forEach(([feed, posts]) => {
-              const newPosts = differenceBy(posts, state.posts, 'href');
-              if (state.runApp == false) {
-                console.log(state.runApp);
-                watchedState.runApp = true;
-              }
-              if (newPosts.length !== 0) {
-                console.log(state.posts);
-                renderPosts(newPosts);
-                watchedState.posts.push(...newPosts);
-              }
-              const newFeeds = differenceBy(feed, state.feeds, 'feedlink');
-
-              if (newFeeds.length !== 0) {
-                console.log(newFeeds);
-                renderFeeds(newFeeds);
-                watchedState.feeds.push(...newFeeds);
-              }
-              renderLinks();
-            }))
-            .catch((err) => {
-              const errorName = err.name;
-              if (errorName === 'TypeError') {
-                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
-                watchedState.urlLinks = watchedState.urlLinks.filter((x) => x !== link);
-                console.log('AAAA');
-              }
-              if (errorName === 'AxiosError') {
-                watchedState.errors.push(i18nextInstance1.t('errorNetWork'));
-              }
-              watchedState.errors.push(i18nextInstance1.t('errorParsing'));
-            });
-          setTimeout(run, 5000);
-        }, 0); */
         break;
       case 'errors':
-        console.log(state.errors);
         renderErrors(state.errors);
-
         break;
       case 'posts':
         break;
       case 'feeds':
         break;
       case 'runApp':
-        console.log('RRRUUUNNN');
         renderFeedsConstainer();
         renderPostsContainer();
         break;
       case 'uiState.modals':
-        console.log(state.uiState.modals);
         renderModals(state.uiState.modals, state.posts);
         break;
       default:
