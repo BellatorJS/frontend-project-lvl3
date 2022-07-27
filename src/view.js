@@ -172,7 +172,7 @@ const foo = (state) => {
               });
             });
 
-          setTimeout(run, 1000);
+          setTimeout(run, 5000);
         }, 0);
 
         // .then((x) => console.log(x)));
