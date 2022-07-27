@@ -46,7 +46,7 @@ form.addEventListener('submit', (e) => {
   });
 
   const schema = yup.object().shape({
-    url: yup.string().matches(/(rss)/).url().notOneOf(state.urlLinks),
+    url: yup.string().url().notOneOf(state.urlLinks),
   });
 
   schema.validate(formDates)
