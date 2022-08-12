@@ -16,7 +16,7 @@ export default () => {
     },
 
   };
-  const watchedState = render(state);
+  const watcher = render(state);
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
@@ -35,18 +35,18 @@ export default () => {
   const validation = (link) => {
     const { url } = link;
     schema.validate(link)
-      .then(() => request(url, watchedState)
+      .then(() => request(url, watcher)
         .then((xmlString) => {
           const [rssPosts, feed] = parsing(xmlString, state);
-          watchedState.feeds.push(...feed);
-          watchedState.posts.push(...rssPosts);
-          return watchedState.urlList.push(url);
+          watcher.feeds.push(...feed);
+          watcher.posts.push(...rssPosts);
+          return watcher.urlList.push(url);
         }))
       .catch((err) => {
         if (err.name === 'ParseError' || err.name === 'AxiosError') {
-          return watchedState.error.push(`errors.${err.name}`);
+          return watcher.error.push(`errors.${err.name}`);
         }
-        return watchedState.error.push(...err.errors);
+        return watcher.error.push(...err.errors);
       });
   };
 
@@ -59,6 +59,6 @@ export default () => {
   posts.addEventListener('click', (e) => {
     const { target } = e;
     const id = target.getAttribute('data-id');
-    watchedState.uiState.modal.push(id);
+    watcher.uiState.modal.push(id);
   });
 };
