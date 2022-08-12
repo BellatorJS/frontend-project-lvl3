@@ -17,10 +17,8 @@ export default () => {
 
   };
   const watchedState = render(state);
-
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
-
 
   setLocale({
     string: {
@@ -39,9 +37,9 @@ export default () => {
     schema.validate(link)
       .then(() => request(url, watchedState)
         .then((xmlString) => {
-          const [posts, feed] = parsing(xmlString, state);
+          const [rssPosts, feed] = parsing(xmlString, state);
           watchedState.feeds.push(...feed);
-          watchedState.posts.push(...posts);
+          watchedState.posts.push(...rssPosts);
           return watchedState.urlList.push(url);
         }))
       .catch((err) => {
