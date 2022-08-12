@@ -1,54 +1,61 @@
-import axios from 'axios';
 import uniqueId from 'lodash/uniqueId.js';
+import differenceBy from 'lodash/differenceBy.js';
 
-const getParsingDatas = (promise) => {
-  const feedContainer = [];
-  const feedDescription = promise.querySelector('description').textContent;
-  const feedTitle = promise.querySelector('title').textContent;
-  const feedlink = promise.querySelector('link').textContent;
+const getFeed = (doc, state) => {
+  const feedData = [];
+  const feedDescription = doc.querySelector('description').textContent;
+  const feedTitle = doc.querySelector('title').textContent;
+  const feedLink = doc.querySelector('link').textContent;
   const feedId = uniqueId();
   const feedContent = {
     feedDescription,
     feedTitle,
-    feedlink,
+    feedLink,
     feedId,
   };
-  feedContainer.push(feedContent);
-  // if (state) { renderLinks(); }
-  const items = Array.from(promise.querySelectorAll('item'));
-  const posts = items.map((post) => {
+
+  feedData.push(feedContent);
+  const newFeeds = differenceBy(feedData, state.feeds, 'feedLink');
+  return newFeeds;
+};
+const getPosts = (doc, state) => {
+  const postData = Array.from(doc.querySelectorAll('item'));
+  const posts = postData.map((post) => {
     const id = uniqueId();
     const title = post.querySelector('title').textContent;
     const link = post.querySelector('link').textContent;
     const description = post.querySelector('description').textContent;
     return {
       'data-id': id,
-      href: link,
+      url: link,
       title,
       description,
     };
   });
-  return [feedContainer, posts];
+  console.log('Это пошли array посты');
+  console.log(posts);
+  const newPosts = differenceBy(posts, state.posts, 'url');
+  console.log('Это пошли посты');
+  console.log(newPosts);
+  return newPosts;
 };
-
-const parsingHtml = (datas) => {
-  const domparser = new DOMParser();
-  const html = domparser.parseFromString(datas, 'text/xml');
-  return html;
-};
-function parsing(rssLink) {
-  const result = axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${encodeURIComponent(`${rssLink}`)}`)
-    .then((response) => response.data.contents)
-    .then((response1) => parsingHtml(response1))
-    .then((data) => getParsingDatas(data))
-    .catch((error) => {
-      const errorName = error.name;
-      if (errorName === 'TypeError') {
-        return 'TypeError';
-      }
-      return 'AxiosError';
-    });
-  return result;
+function ParseError(message) {
+  this.message = message;
+  this.name = 'ParseError';
 }
-
-export default parsing;
+const getXMLDocument = (xmlString) => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(xmlString, 'text/xml');
+  const errorNode = doc.querySelector('parsererror');
+  if (errorNode) {
+    throw new ParseError();
+  } else {
+    return doc;
+  }
+};
+export default (content, state) => {
+  const data = getXMLDocument(content);
+  const posts = getPosts(data, state);
+  const feed = getFeed(data, state);
+  return [posts, feed];
+};

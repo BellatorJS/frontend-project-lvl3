@@ -8,20 +8,26 @@ const runI18 = () => {
     resources: {
       ru: {
         translation: {
-          key: 'RSS успешно загружен',
-          errorURL: 'Ссылка должна быть валидным URL',
-          errorRepeat: 'RSS уже существует',
-          errorParsing: 'Ресурс не содержит валидный RSS',
-          errorNetWork: 'Ошибка сети',
-          btnAdd: 'Добавить',
-          btnView: 'Просмотр',
+          successDownload: 'RSS успешно загружен',
           posts: 'Посты',
           feeds: 'Фиды',
           display: 'RSS агрегатор',
-          readPost: 'Читать полностью',
-          closeModal: 'Закрыть',
           example: 'Пример: https://ru.hexlet.io/lessons.rss',
           inputPlaceholder: 'Cсылка RSS',
+          validationError: {
+            NotValideUrlError: 'Ссылка должна быть валидным URL',
+            NotOneOfError: 'RSS уже существует',
+          },
+          errors: {
+            ParseError: 'Ресурс не содержит валидный RSS',
+            AxiosError: 'Ошибка сети',
+          },
+          buttons: {
+            add: 'Добавить',
+            view: 'Просмотр',
+            readPost: 'Читать полностью',
+            closeModal: 'Закрыть',
+          },
         },
       },
     },
