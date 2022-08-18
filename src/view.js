@@ -1,11 +1,8 @@
+/* eslint-disable no-unused-expressions */
 import onChange from 'on-change';
 import differenceBy from 'lodash/differenceBy.js';
-import runI18 from './locales/locales.js';
-import request from './routing.js';
-import parsing from './parsing.js';
 
-export default (state) => {
-  const i18nextInstance = runI18();
+export default (state, i18n) => {
   const renderPostsContainer = () => {
     const cardPosts = document.createElement('div');
     cardPosts.className = 'card border-0';
@@ -14,7 +11,7 @@ export default (state) => {
     cardBody.className = 'card-body';
     const postName = document.createElement('h2');
     postName.className = 'card-title m4';
-    postName.textContent = i18nextInstance.t('posts');
+    postName.textContent = i18n.t('posts');
     cardPosts.append(cardBody);
     cardBody.append(postName);
     const postsEl = document.querySelector('.posts');
@@ -22,9 +19,7 @@ export default (state) => {
   };
   const renderPosts = (posts) => {
     const cardPosts = document.getElementById('cardPosts');
-    (function isPostsContainer() {
-      return cardPosts ?? renderPostsContainer();
-    }());
+    cardPosts ?? renderPostsContainer();
     posts.forEach((post) => {
       const cardsPosts = document.getElementById('cardPosts');
       const ul = document.createElement('ul');
@@ -35,7 +30,7 @@ export default (state) => {
       a.className = 'fw-bold';
       a.setAttribute('rel', 'noopener noreferrer');
       a.setAttribute('target', '_blank');
-      a.setAttribute('href', `${post.url}`);
+      a.setAttribute('href', `${post.link}`);
       a.setAttribute('data-id', `${post['data-id']}`);
       a.textContent = `${post.title}`;
       const btn = document.createElement('button');
@@ -44,7 +39,7 @@ export default (state) => {
       btn.setAttribute('data-id', `${post['data-id']}`);
       btn.setAttribute('data-bs-toggle', 'modal');
       btn.setAttribute('data-bs-target', '#modal');
-      btn.textContent = i18nextInstance.t('buttons.view');
+      btn.textContent = i18n.t('buttons.view');
       li.prepend(a);
       li.append(btn);
       ul.append(li);
@@ -59,7 +54,7 @@ export default (state) => {
     cardBodyFeed.className = 'card-body';
     const feedName = document.createElement('h2');
     feedName.className = 'card-title h4';
-    feedName.textContent = i18nextInstance.t('feeds');
+    feedName.textContent = i18n.t('feeds');
     cardFeeds.append(cardBodyFeed);
     cardBodyFeed.append(feedName);
     const feedsEl = document.querySelector('.feeds');
@@ -67,10 +62,7 @@ export default (state) => {
   };
   const renderFeeds = (feeds) => {
     const feedsNode = document.getElementById('cardFeeds');
-    (function isFeedsConstainer() {
-      return feedsNode ?? renderFeedsConstainer();
-    }());
-
+    feedsNode ?? renderFeedsConstainer();
     feeds.forEach((feed) => {
       const { feedDescription } = feed;
       const { feedTitle } = feed;
@@ -99,7 +91,7 @@ export default (state) => {
     const formControl = document.querySelector('.form-control');
     formControl.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-    feedback.textContent = i18nextInstance.t(error);
+    feedback.textContent = i18n.t(error);
   }
   const renderSuccessFeedback = () => {
     const feedback = document.querySelector('.feedback');
@@ -107,7 +99,7 @@ export default (state) => {
     const inputform = form.elements[0];
     feedback.classList.remove('text-danger');
     feedback.classList.add('text-success');
-    feedback.textContent = i18nextInstance.t('successDownload');
+    feedback.textContent = i18n.t('successDownload');
     inputform.value = '';
     inputform.focus();
   };
@@ -117,26 +109,14 @@ export default (state) => {
       const post = posts.find((data) => data['data-id'] === id);
       const title = document.querySelector('.modal-title');
       title.textContent = post.title;
-      i18nextInstance.t('errorRepeat');
       const description = document.querySelector('.text-break');
       description.textContent = post.description;
       const linkBtn = document.querySelector('.full-article');
-      linkBtn.setAttribute('href', post.url);
+      linkBtn.setAttribute('href', post.link);
       const element = document.querySelector(`[data-id='${id}']`);
       element.classList.remove('fw-bold');
       element.classList.add('fw-normal');
     });
-  };
-
-  const updatePost = (watcher) => {
-    const promises = state.urlList.map((url) => request(url, watcher));
-    return Promise.all(promises)
-      .then((xmlStrings) => {
-        xmlStrings.forEach((xmlString) => {
-          const [posts] = parsing(xmlString, state);
-          return watcher.posts.push(...posts);
-        });
-      });
   };
 
   const watchedState = onChange(state, (path, value, previousValue) => {
@@ -145,20 +125,15 @@ export default (state) => {
         renderError(...state.error);
         break;
       case ('urlList'):
-        console.log(state.urlList);
         renderSuccessFeedback();
-        setTimeout(function run() {
-          updatePost(watchedState);
-          setTimeout(run, 5000);
-        }, 0);
         break;
       case ('feeds'): {
-        const newFeeds = differenceBy(value, previousValue, 'feedLink');
+        const newFeeds = differenceBy(value, previousValue, 'link');
         renderFeeds(newFeeds);
         break;
       }
       case ('posts'): {
-        const newPosts = differenceBy(value, previousValue, 'url');
+        const newPosts = differenceBy(value, previousValue, 'link');
         renderPosts(newPosts);
         break;
       }

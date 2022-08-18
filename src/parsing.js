@@ -1,44 +1,27 @@
-import uniqueId from 'lodash/uniqueId.js';
-import differenceBy from 'lodash/differenceBy.js';
-
-const getFeed = (doc, state) => {
-  const feedData = [];
-  const feedDescription = doc.querySelector('description').textContent;
-  const feedTitle = doc.querySelector('title').textContent;
-  const feedLink = doc.querySelector('link').textContent;
-  const feedId = uniqueId();
-  const feedContent = {
-    feedDescription,
-    feedTitle,
-    feedLink,
-    feedId,
-  };
-
-  feedData.push(feedContent);
-  const newFeeds = differenceBy(feedData, state.feeds, 'feedLink');
-  return newFeeds;
-};
-const getPosts = (doc, state) => {
-  const postData = Array.from(doc.querySelectorAll('item'));
-  const posts = postData.map((post) => {
-    const id = uniqueId();
-    const title = post.querySelector('title').textContent;
-    const link = post.querySelector('link').textContent;
-    const description = post.querySelector('description').textContent;
-    return {
-      'data-id': id,
-      url: link,
+const parserDoc = (doc) => {
+  const items = Array.from(doc.querySelectorAll('item'));
+  const postsData = items.map((item) => {
+    const title = item.querySelector('title').textContent;
+    const link = item.querySelector('link').textContent;
+    const description = item.querySelector('description').textContent;
+    const postData = {
+      link,
       title,
       description,
     };
+    return postData;
   });
-  console.log('Это пошли array посты');
-  console.log(posts);
-  const newPosts = differenceBy(posts, state.posts, 'url');
-  console.log('Это пошли посты');
-  console.log(newPosts);
-  return newPosts;
+  const feedDescription = doc.querySelector('description').textContent;
+  const feedTitle = doc.querySelector('title').textContent;
+  const link = doc.querySelector('link').textContent;
+  const feed = {
+    feedDescription,
+    feedTitle,
+    link,
+  };
+  return [postsData, [feed]];
 };
+
 function ParseError(message) {
   this.message = message;
   this.name = 'ParseError';
@@ -53,9 +36,8 @@ const getXMLDocument = (xmlString) => {
     return doc;
   }
 };
-export default (content, state) => {
+export default (content) => {
   const data = getXMLDocument(content);
-  const posts = getPosts(data, state);
-  const feed = getFeed(data, state);
-  return [posts, feed];
+  const parseData = parserDoc(data);
+  return parseData;
 };
