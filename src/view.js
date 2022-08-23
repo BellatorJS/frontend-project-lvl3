@@ -86,12 +86,12 @@ export default (state, i18n) => {
     });
   };
 
-  function renderError(error) {
+  function renderError(...error) {
     const feedback = document.querySelector('.feedback');
     const formControl = document.querySelector('.form-control');
     formControl.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-    feedback.textContent = i18n.t(error);
+    feedback.textContent = i18n.t(...error);
   }
   const renderSuccessFeedback = () => {
     const feedback = document.querySelector('.feedback');

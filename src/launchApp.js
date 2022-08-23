@@ -21,7 +21,7 @@ export default () => {
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
-  const getElems = (contents) => {
+  const prepareData = (contents) => {
     const newContent = contents.map((content) => {
       const id = uniqueId();
       const dataId = {
@@ -41,47 +41,50 @@ export default () => {
     },
   });
   const schema = yup.object().shape({
-    url: yup.string().notOneOf([state.urlList]).url(),
+    url: yup.string().url(),
   });
-
-  const updatePosts = (watcher) => {
-    const promises = state.urlList.map((url) => request(url, watcher));
-    return Promise.all(promises)
-      .then((xmlStrings) => {
-        xmlStrings.forEach((xmlString) => {
-          const [postsContent] = parsing(xmlString);
-          const newPosts = getElems(postsContent);
-          return watcher.posts.push(...newPosts);
-        });
-      });
+  const isNotOneOfUrls = (feeds, url) => {
+    const links = feeds.map((feed) => feed.link);
+    const schema1 = yup.mixed().notOneOf(links);
+    return schema1.validate(url);
   };
-  const getValidData = (link) => {
+  const updatePosts = (watcher) => {
+    const links = state.feeds.map((feed) => feed.link);
+    const promises = links.map((link) => request(link, watcher)
+      .then((xmlString) => {
+        const [postsContent] = parsing(xmlString);
+        const post = prepareData(postsContent);
+        watcher.posts.push(...post);
+      }));
+    Promise.all(promises).then(() => setTimeout(updatePosts, 5000, view));
+  };
+  const errorsMapping = {
+    AxiosError: (err) => view.error.push(`errors.${err.name}`),
+    ParseError: (err) => view.error.push(`errors.${err.name}`),
+    ValidationError: (err) => view.error.push(`${(err.errors)}`),
+  };
+  const getNewFeed = (link) => {
     const { url } = link;
     schema.validate(link)
-      .then(() => request(url, view)
-        .then((xmlString) => {
-          const [, feedContent] = parsing(xmlString);
-          const feed = getElems(feedContent);
-          view.feeds.push(...feed);
-          view.urlList.push(url);
-          setTimeout(function run() {
+      .then(() => isNotOneOfUrls(state.feeds, url)
+        .then(() => request(url, view)
+          .then((xmlString) => {
+            const [, feedContent] = parsing(xmlString, i18nextInstance);
+            const preperedFeed = prepareData(feedContent);
+            const [feed] = [...preperedFeed];
+            feed.link = url;
+            view.feeds.push(feed);
             updatePosts(view);
-            setTimeout(run, 5000);
-          }, 0);
-        }))
+          })))
       .catch((err) => {
-        if (err.name === 'ParseError' || err.name === 'AxiosError') {
-          return view.error.push(`errors.${err.name}`);
-        }
-        return view.error.push(...err.errors);
+        errorsMapping[err.name](err);
       });
   };
-
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const url = Object.fromEntries(formData);
-    getValidData(url);
+    getNewFeed(url);
   });
   posts.addEventListener('click', (e) => {
     const { target } = e;

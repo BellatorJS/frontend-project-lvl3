@@ -22,22 +22,24 @@ const parserDoc = (doc) => {
   return [postsData, [feed]];
 };
 
-function ParseError(message) {
-  this.message = message;
-  this.name = 'ParseError';
+class ParseError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'ParseError';
+  }
 }
-const getXMLDocument = (xmlString) => {
+const getXMLDocument = (xmlString, i18next) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlString, 'text/xml');
   const errorNode = doc.querySelector('parsererror');
   if (errorNode) {
-    throw new ParseError();
+    throw new ParseError(i18next.t('errors.ParseError'));
   } else {
     return doc;
   }
 };
-export default (content) => {
-  const data = getXMLDocument(content);
+export default (content, i18n) => {
+  const data = getXMLDocument(content, i18n);
   const parseData = parserDoc(data);
   return parseData;
 };
