@@ -8,7 +8,6 @@ import runI18 from './locales/locales.js';
 
 export default () => {
   const state = {
-    urlList: [],
     feeds: [],
     posts: [],
     error: [],

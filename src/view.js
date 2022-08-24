@@ -124,12 +124,10 @@ export default (state, i18n) => {
       case ('error'):
         renderError(...state.error);
         break;
-      case ('urlList'):
-        renderSuccessFeedback();
-        break;
       case ('feeds'): {
         const newFeeds = differenceBy(value, previousValue, 'link');
         renderFeeds(newFeeds);
+        renderSuccessFeedback();
         break;
       }
       case ('posts'): {
