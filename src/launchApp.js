@@ -55,6 +55,13 @@ export default () => {
         const [postsContent] = parsing(xmlString);
         const post = prepareData(postsContent);
         watcher.posts.push(...post);
+      })
+      .catch((e) => {
+        let delay = 5000;
+        if (e.name === 'AxiosError') {
+          delay += 10000;
+          return setTimeout(updatePosts, delay, view);
+        }
       }));
     Promise.all(promises).then(() => setTimeout(updatePosts, 5000, view));
   };
@@ -64,15 +71,6 @@ export default () => {
     ValidationError: (err) => view.error.push(`${(err.errors)}`),
   };
   const getNewFeed = (link) => {
-    /* const addButton = document.getElementById('addButton');
-    const spinner = document.getElementById('spinner');
-    const submitBtn = document.getElementById('submitBtn');
-    const inp = document.getElementById('url-input');
-
-    spinner.classList.replace('visually-hidden', 'visually-visible');
-    inp.setAttribute('disabled', true);
-    submitBtn.setAttribute('disabled', true);
-    addButton.textContent = i18nextInstance.t('buttons.load'); */
     view.status = 'loading';
     const { url } = link;
     schema.validate(link)
@@ -80,10 +78,12 @@ export default () => {
         .then(() => request(url, view)
           .then((xmlString) => {
             view.status = 'loading';
-            const [, feedContent] = parsing(xmlString, i18nextInstance);
+            const [postsContent, feedContent] = parsing(xmlString, i18nextInstance);
             const preperedFeed = prepareData(feedContent);
             const [feed] = [...preperedFeed];
             feed.link = url;
+            const post = prepareData(postsContent);
+            view.posts.push(...post);
             view.feeds.push(feed);
             updatePosts(view);
           })))
@@ -94,15 +94,12 @@ export default () => {
         console.log('AAAAAAAAAAAAAAAAAAAA');
         view.status = 'waiting';
         console.log(state);
-        /* addButton.textContent = i18nextInstance.t('buttons.add');
-        spinner.classList.replace('visually-visible', 'visually-hidden');
-        inp.removeAttribute('disabled');
-        submitBtn.removeAttribute('disabled'); */
       });
   };
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    console.log(e);
     console.log(form.elements);
     const formData = new FormData(e.target);
     const url = Object.fromEntries(formData);
