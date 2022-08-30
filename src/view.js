@@ -3,6 +3,12 @@ import onChange from 'on-change';
 import differenceBy from 'lodash/differenceBy.js';
 
 export default (state, i18n) => {
+  const feedback = document.querySelector('.feedback');
+  const formControl = document.querySelector('.form-control');
+  const addButton = document.getElementById('addButton');
+  const spinner = document.getElementById('spinner');
+  const submitBtn = document.getElementById('submitBtn');
+
   const renderPostsContainer = () => {
     const cardPosts = document.createElement('div');
     cardPosts.className = 'card border-0';
@@ -87,14 +93,11 @@ export default (state, i18n) => {
   };
 
   function renderError(...error) {
-    const feedback = document.querySelector('.feedback');
-    const formControl = document.querySelector('.form-control');
     formControl.classList.add('is-invalid');
     feedback.classList.add('text-danger');
     feedback.textContent = i18n.t(...error);
   }
   const renderSuccessFeedback = () => {
-    const feedback = document.querySelector('.feedback');
     const form = document.querySelector('.rss-form');
     const inputform = form.elements[0];
     feedback.classList.remove('text-danger');
@@ -102,6 +105,22 @@ export default (state, i18n) => {
     feedback.textContent = i18n.t('successDownload');
     inputform.value = '';
     inputform.focus();
+  };
+  const renderLoadingStatus = () => {
+    spinner.classList.replace('visually-hidden', 'visually-visible');
+    formControl.setAttribute('disabled', true);
+    submitBtn.setAttribute('disabled', true);
+    addButton.textContent = i18n.t('buttons.load');
+    feedback.textContent = '';
+    formControl.classList.remove('is-invalid');
+    feedback.classList.remove('text-danger');
+  };
+
+  const renderWaitingStatus = () => {
+    addButton.textContent = i18n.t('buttons.add');
+    spinner.classList.replace('visually-visible', 'visually-hidden');
+    formControl.removeAttribute('disabled');
+    submitBtn.removeAttribute('disabled');
   };
 
   const renderModal = (elemsId, posts) => {
@@ -118,6 +137,10 @@ export default (state, i18n) => {
       element.classList.add('fw-normal');
     });
   };
+  const loadStatus = {
+    loading: () => renderLoadingStatus(),
+    waiting: () => renderWaitingStatus(),
+  };
 
   const watchedState = onChange(state, (path, value, previousValue) => {
     switch (path) {
@@ -133,6 +156,10 @@ export default (state, i18n) => {
       case ('posts'): {
         const newPosts = differenceBy(value, previousValue, 'link');
         renderPosts(newPosts);
+        break;
+      }
+      case ('status'): {
+        loadStatus[value]();
         break;
       }
       case ('uiState.modal'):

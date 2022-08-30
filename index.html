@@ -33,7 +33,11 @@
                                         <label for="url-input">Ссылка RSS</label>
                                     </div>
                                 </div>
-                                <div class="col-auto"><button type="submit" aria-label="add" class="h-100 btn btn-lg btn-primary px-sm-5">Добавить</button>
+                                <div class="col-auto d-flex align-items-center">
+                                    <button class="h-100 btn btn-lg btn-primary px-sm-5 text-nowrap" id ='submitBtn'  aria-label="add" type="submit" aria-disabled="true">
+                                        <span class="spinner-border spinner-border-sm visually-hidden" id="spinner"></span>
+                                        <span class="visually-visible" id ='addButton' >Добавить</span>
+                                      </button>
                                 </div>
                             </div>
                         </form>
