@@ -45,8 +45,6 @@ export default () => {
   });
   const isNotOneOfUrls = (feeds, url) => {
     const links = feeds.map((feed) => feed.link);
-    console.log(links);
-    console.log(url);
     const schema1 = yup.mixed().notOneOf(links);
     return schema1.validate(url);
   };
@@ -58,13 +56,13 @@ export default () => {
         const post = prepareData(postsContent);
         watcher.posts.push(...post);
       })
-      // eslint-disable-next-line consistent-return
-      .catch((e) => {
+      .catch((err) => {
         let delay = 5000;
-        if (e.name === 'AxiosError') {
+        if (err.name === 'AxiosError') {
           delay += 10000;
-          return setTimeout(updatePosts, delay, view);
+          setTimeout(updatePosts, delay, view);
         }
+        return err;
       }));
     Promise.all(promises).then(() => setTimeout(updatePosts, 5000, view));
   };

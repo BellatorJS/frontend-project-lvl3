@@ -9,9 +9,8 @@ const setUrl = (rssLink) => {
   return url;
 };
 
-export default (url, watcher) => {
+export default (url) => {
   const link = setUrl(url);
   return axios.get(link)
-    .then((response) => response.data.contents)
-    .catch((error) => watcher.error.push(`errors.${error.name}`));
+    .then((response) => response.data.contents);
 };
