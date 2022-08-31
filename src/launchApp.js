@@ -105,7 +105,7 @@ export default () => {
   });
   posts.addEventListener('click', (e) => {
     const { target } = e;
-    const id = target.getAttribute('data-id');
+    const id = target.getAttribute('id');
     view.uiState.modal.push(id);
   });
 };
