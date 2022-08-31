@@ -46,6 +46,7 @@ export default () => {
   const isNotOneOfUrls = (feeds, url) => {
     const links = feeds.map((feed) => feed.link);
     console.log(links);
+    console.log(url);
     const schema1 = yup.mixed().notOneOf(links);
     return schema1.validate(url);
   };

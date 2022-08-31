@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-expressions */
 import onChange from 'on-change';
 import differenceBy from 'lodash/differenceBy.js';
+import last from 'lodash/last.js';
 
 export default (state, i18n) => {
   const feedback = document.querySelector('.feedback');
@@ -95,7 +96,6 @@ export default (state, i18n) => {
   function renderError(error) {
     formControl.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-
     feedback.textContent = i18n.t(error);
   }
   const renderSuccessFeedback = () => {
@@ -145,8 +145,10 @@ export default (state, i18n) => {
 
   const watchedState = onChange(state, (path, value, previousValue) => {
     switch (path) {
-      case ('error'):
-        renderError(...value);
+      case ('error'): {
+        const error = last(value);
+        renderError(error);
+      }
         break;
       case ('feeds'): {
         const newFeeds = differenceBy(value, previousValue, 'link');
