@@ -25,7 +25,7 @@ export default () => {
     const newContent = contents.map((content) => {
       const id = uniqueId();
       const dataId = {
-        'data-id': id,
+        id,
       };
       const updatedContent = { ...content, ...dataId };
       return updatedContent;
@@ -45,6 +45,7 @@ export default () => {
   });
   const isNotOneOfUrls = (feeds, url) => {
     const links = feeds.map((feed) => feed.link);
+    console.log(links);
     const schema1 = yup.mixed().notOneOf(links);
     return schema1.validate(url);
   };
@@ -56,6 +57,7 @@ export default () => {
         const post = prepareData(postsContent);
         watcher.posts.push(...post);
       })
+      // eslint-disable-next-line consistent-return
       .catch((e) => {
         let delay = 5000;
         if (e.name === 'AxiosError') {
@@ -91,16 +93,12 @@ export default () => {
         errorsMapping[err.name](err);
       })
       .finally(() => {
-        console.log('AAAAAAAAAAAAAAAAAAAA');
         view.status = 'waiting';
-        console.log(state);
       });
   };
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    console.log(e);
-    console.log(form.elements);
     const formData = new FormData(e.target);
     const url = Object.fromEntries(formData);
     getNewFeed(url);

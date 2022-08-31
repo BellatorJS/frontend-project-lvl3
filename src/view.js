@@ -37,12 +37,12 @@ export default (state, i18n) => {
       a.setAttribute('rel', 'noopener noreferrer');
       a.setAttribute('target', '_blank');
       a.setAttribute('href', `${post.link}`);
-      a.setAttribute('data-id', `${post['data-id']}`);
+      a.setAttribute('id', `${post.id}`);
       a.textContent = `${post.title}`;
       const btn = document.createElement('button');
       btn.setAttribute('type', 'button');
       btn.className = 'btn btn-outline-primary btn-sm';
-      btn.setAttribute('data-id', `${post['data-id']}`);
+      btn.setAttribute('id', `${post.id}`);
       btn.setAttribute('data-bs-toggle', 'modal');
       btn.setAttribute('data-bs-target', '#modal');
       btn.textContent = i18n.t('buttons.view');
@@ -92,10 +92,11 @@ export default (state, i18n) => {
     });
   };
 
-  function renderError(...error) {
+  function renderError(error) {
     formControl.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-    feedback.textContent = i18n.t(...error);
+
+    feedback.textContent = i18n.t(error);
   }
   const renderSuccessFeedback = () => {
     const form = document.querySelector('.rss-form');
@@ -125,14 +126,14 @@ export default (state, i18n) => {
 
   const renderModal = (elemsId, posts) => {
     elemsId.forEach((id) => {
-      const post = posts.find((data) => data['data-id'] === id);
+      const post = posts.find((data) => data.id === id);
       const title = document.querySelector('.modal-title');
       title.textContent = post.title;
       const description = document.querySelector('.text-break');
       description.textContent = post.description;
       const linkBtn = document.querySelector('.full-article');
       linkBtn.setAttribute('href', post.link);
-      const element = document.querySelector(`[data-id='${id}']`);
+      const element = document.querySelector(`[id='${id}']`);
       element.classList.remove('fw-bold');
       element.classList.add('fw-normal');
     });
@@ -145,7 +146,7 @@ export default (state, i18n) => {
   const watchedState = onChange(state, (path, value, previousValue) => {
     switch (path) {
       case ('error'):
-        renderError(...state.error);
+        renderError(...value);
         break;
       case ('feeds'): {
         const newFeeds = differenceBy(value, previousValue, 'link');
