@@ -55,17 +55,10 @@ export default () => {
         const [postsContent] = parsing(xmlString);
         const post = prepareData(postsContent);
         watcher.posts.push(...post);
-      })
-      .catch((err) => {
-        let delay = 5000;
-        if (err.name === 'AxiosError') {
-          delay += 10000;
-          setTimeout(updatePosts, delay, view);
-        }
-        return err;
       }));
-    Promise.all(promises).then(() => setTimeout(updatePosts, 5000, view));
+    Promise.all(promises).finally(() => setTimeout(updatePosts, 5000, view));
   };
+  updatePosts(view);
   const errorsMapping = {
     AxiosError: (err) => view.error.push(`errors.${err.name}`),
     ParseError: (err) => view.error.push(`errors.${err.name}`),
@@ -86,7 +79,6 @@ export default () => {
             const post = prepareData(postsContent);
             view.posts.push(...post);
             view.feeds.push(feed);
-            updatePosts(view);
           })))
       .catch((err) => {
         errorsMapping[err.name](err);
