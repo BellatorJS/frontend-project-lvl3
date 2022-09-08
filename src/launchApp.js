@@ -17,7 +17,7 @@ export default () => {
     },
   };
   const i18nextInstance = runI18();
-  const view = render(state, i18nextInstance);
+  const stateObserver = render(state, i18nextInstance);
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
@@ -40,13 +40,13 @@ export default () => {
       notOneOf: 'validationError.NotOneOfError',
     },
   });
-  const schema = yup.object().shape({
-    url: yup.string().url(),
-  });
-  const isNotOneOfUrls = (feeds, url) => {
-    const links = feeds.map((feed) => feed.link);
-    const schema1 = yup.mixed().notOneOf(links);
-    return schema1.validate(url);
+
+  const validation = (url) => {
+    const links = state.feeds.map((feed) => feed.link);
+    const schema = yup.object().shape({
+      url: yup.string().url().notOneOf(links),
+    });
+    return schema.validate(url);
   };
   const updatePosts = (watcher) => {
     const links = state.feeds.map((feed) => feed.link);
@@ -56,35 +56,34 @@ export default () => {
         const post = prepareData(postsContent);
         watcher.posts.push(...post);
       }));
-    Promise.all(promises).finally(() => setTimeout(updatePosts, 5000, view));
+    Promise.all(promises).finally(() => setTimeout(updatePosts, 5000, stateObserver));
   };
-  updatePosts(view);
+  updatePosts(stateObserver);
   const errorsMapping = {
-    AxiosError: (err) => view.error.push(`errors.${err.name}`),
-    ParseError: (err) => view.error.push(`errors.${err.name}`),
-    ValidationError: (err) => view.error.push(`${(err.errors)}`),
+    AxiosError: (err) => stateObserver.error.push(`errors.${err.name}`),
+    ParseError: (err) => stateObserver.error.push(`errors.${err.name}`),
+    ValidationError: (err) => stateObserver.error.push(`${(err.errors)}`),
   };
   const getNewFeed = (link) => {
-    view.status = 'loading';
+    stateObserver.status = 'loading';
     const { url } = link;
-    schema.validate(link)
-      .then(() => isNotOneOfUrls(state.feeds, url)
-        .then(() => request(url, view)
-          .then((xmlString) => {
-            view.status = 'loading';
-            const [postsContent, feedContent] = parsing(xmlString, i18nextInstance);
-            const preperedFeed = prepareData(feedContent);
-            const [feed] = [...preperedFeed];
-            feed.link = url;
-            const post = prepareData(postsContent);
-            view.posts.push(...post);
-            view.feeds.push(feed);
-          })))
+    validation(link)
+      .then(() => request(url, stateObserver))
+      .then((xmlString) => {
+        stateObserver.status = 'loading';
+        const [postsContent, feedContent] = parsing(xmlString);
+        const preperedFeed = prepareData(feedContent);
+        const post = prepareData(postsContent);
+        const [feed] = [...preperedFeed];
+        feed.link = url;
+        stateObserver.posts.push(...post);
+        stateObserver.feeds.push(feed);
+      })
       .catch((err) => {
         errorsMapping[err.name](err);
       })
       .finally(() => {
-        view.status = 'waiting';
+        stateObserver.status = 'waiting';
       });
   };
 
@@ -97,6 +96,6 @@ export default () => {
   posts.addEventListener('click', (e) => {
     const { target } = e;
     const id = target.getAttribute('id');
-    view.uiState.modal.push(id);
+    stateObserver.uiState.modal.push(id);
   });
 };

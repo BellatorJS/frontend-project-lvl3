@@ -14,12 +14,12 @@ const parserDoc = (doc) => {
   const feedDescription = doc.querySelector('description').textContent;
   const feedTitle = doc.querySelector('title').textContent;
   const link = doc.querySelector('link').textContent;
-  const feed = {
+  const feed = [{
     feedDescription,
     feedTitle,
     link,
-  };
-  return [postsData, [feed]];
+  }];
+  return [postsData, feed];
 };
 
 class ParseError extends Error {
@@ -28,18 +28,18 @@ class ParseError extends Error {
     this.name = 'ParseError';
   }
 }
-const getXMLDocument = (xmlString, i18next) => {
+const getXMLDocument = (xmlString) => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(xmlString, 'text/xml');
   const errorNode = doc.querySelector('parsererror');
   if (errorNode) {
-    throw new ParseError(i18next.t('errors.ParseError'));
+    throw new ParseError('ParseError');
   } else {
     return doc;
   }
 };
-export default (content, i18n) => {
-  const data = getXMLDocument(content, i18n);
+export default (content) => {
+  const data = getXMLDocument(content);
   const parseData = parserDoc(data);
   return parseData;
 };
