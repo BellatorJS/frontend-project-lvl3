@@ -9,7 +9,6 @@ parserOptions:
   sourceType: module
 rules:
   no-console: 0
-  testing-library/render-result-naming-convention": 0
   import/extensions: 
     - error
     - ignorePackages

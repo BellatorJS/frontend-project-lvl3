@@ -17,7 +17,7 @@ export default () => {
     },
   };
   const i18nextInstance = runI18();
-  const stateObserver = render(state, i18nextInstance);
+  const stateObserver = render(state, i18nextInstance);// eslint-disable-line
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
