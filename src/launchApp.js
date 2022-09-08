@@ -1,7 +1,7 @@
 import * as yup from 'yup';
 import { setLocale } from 'yup';
 import uniqueId from 'lodash/uniqueId.js';
-import render from './view.js';
+import renderState from './view.js';
 import request from './routing.js';
 import parsing from './parsing.js';
 import runI18 from './locales/locales.js';
@@ -17,7 +17,7 @@ export default () => {
     },
   };
   const i18nextInstance = runI18();
-  const stateObserver = render(state, i18nextInstance);
+  const stateObserver = renderState(state, i18nextInstance);
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
