@@ -9,7 +9,7 @@ import runI18 from './locales/locales.js';
 export default () => {
   const state = {
     feeds: [],
-    status: 'waiting',
+    status: '',
     posts: [],
     error: [],
     uiState: {
@@ -70,21 +70,11 @@ export default () => {
   updatePosts(stateObserver);
 
   const errorsMapping = {
-    AxiosError: (err, status) => {
-      stateObserver.error.push(`errors.${err.name}`);
-      stateObserver.status = status;
-    },
-    ParseError: (err, status) => {
-      stateObserver.error.push(`errors.${err.name}`);
-      stateObserver.status = status;
-    },
-    ValidationError: (err, status) => {
-      stateObserver.error.push(`${(err.errors)}`);
-      stateObserver.status = status;
-    },
+    AxiosError: (err) => stateObserver.error.push(`errors.${err.name}`),
+    ParseError: (err) => stateObserver.error.push(`errors.${err.name}`),
+    ValidationError: (err) => stateObserver.error.push(`${(err.errors)}`),
   };
   const getNewFeed = (link) => {
-    stateObserver.status = 'loading';
     const { url } = link;
     validation(link)
       .then(() => request(url, stateObserver))
@@ -96,9 +86,11 @@ export default () => {
         feed.link = url;
         stateObserver.posts.push(...post);
         stateObserver.feeds.push(feed);
+        stateObserver.status = 'waiting';
       })
       .catch((err) => {
-        errorsMapping[err.name](err, 'failed');
+        errorsMapping[err.name](err);
+        stateObserver.status = 'waiting';
       });
   };
 
