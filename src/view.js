@@ -117,7 +117,7 @@ export default (state, i18n) => {
     feedback.classList.remove('text-danger');
   };
 
-  const renderWaitingStatus = () => {
+  const renderFailedStatus = () => {
     addButton.textContent = i18n.t('buttons.add');
     spinner.classList.replace('visually-visible', 'visually-hidden');
     formControl.removeAttribute('disabled');
@@ -140,7 +140,7 @@ export default (state, i18n) => {
   };
   const loadStatus = {
     loading: () => renderLoadingStatus(),
-    waiting: () => renderWaitingStatus(),
+    failed: () => renderFailedStatus(),
   };
 
   const watchedState = onChange(state, (path, value, previousValue) => {

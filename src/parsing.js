@@ -14,12 +14,16 @@ const parserDoc = (doc) => {
   const feedDescription = doc.querySelector('description').textContent;
   const feedTitle = doc.querySelector('title').textContent;
   const link = doc.querySelector('link').textContent;
-  const feed = [{
+  const feedData = {
     feedDescription,
     feedTitle,
     link,
-  }];
-  return [postsData, feed];
+  };
+  const parseData = {
+    postsData,
+    feedData,
+  };
+  return parseData;
 };
 
 class ParseError extends Error {

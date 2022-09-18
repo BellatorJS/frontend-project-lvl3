@@ -21,17 +21,26 @@ export default () => {
   const form = document.querySelector('.rss-form');
   const posts = document.querySelector('.posts');
 
-  const prepareData = (contents) => {
-    const newContent = contents.map((content) => {
+  const preparePosts = (postsContent) => {
+    const newPosts = postsContent.map((post) => {
       const id = uniqueId();
       const dataId = {
         id,
       };
-      const updatedContent = { ...content, ...dataId };
-      return updatedContent;
+      const updatedPosts = { ...post, ...dataId };
+      return updatedPosts;
     });
-    return newContent;
+    return newPosts;
   };
+  const prepareFeed = (feed) => {
+    const id = uniqueId();
+    const feedId = {
+      id,
+    };
+    const updatedFeed = { ...feed, ...feedId };
+    return updatedFeed;
+  };
+
   setLocale({
     string: {
       url: 'validationError.NotValideUrlError',
@@ -52,17 +61,27 @@ export default () => {
     const links = state.feeds.map((feed) => feed.link);
     const promises = links.map((link) => request(link, watcher)
       .then((xmlString) => {
-        const [postsContent] = parsing(xmlString);
-        const post = prepareData(postsContent);
+        const { postsData } = parsing(xmlString);
+        const post = preparePosts(postsData);
         watcher.posts.push(...post);
       }));
     Promise.all(promises).finally(() => setTimeout(updatePosts, 5000, stateObserver));
   };
   updatePosts(stateObserver);
+
   const errorsMapping = {
-    AxiosError: (err) => stateObserver.error.push(`errors.${err.name}`),
-    ParseError: (err) => stateObserver.error.push(`errors.${err.name}`),
-    ValidationError: (err) => stateObserver.error.push(`${(err.errors)}`),
+    AxiosError: (err, status) => {
+      stateObserver.error.push(`errors.${err.name}`);
+      stateObserver.status = status;
+    },
+    ParseError: (err, status) => {
+      stateObserver.error.push(`errors.${err.name}`);
+      stateObserver.status = status;
+    },
+    ValidationError: (err, status) => {
+      stateObserver.error.push(`${(err.errors)}`);
+      stateObserver.status = status;
+    },
   };
   const getNewFeed = (link) => {
     stateObserver.status = 'loading';
@@ -71,19 +90,15 @@ export default () => {
       .then(() => request(url, stateObserver))
       .then((xmlString) => {
         stateObserver.status = 'loading';
-        const [postsContent, feedContent] = parsing(xmlString);
-        const preperedFeed = prepareData(feedContent);
-        const post = prepareData(postsContent);
-        const [feed] = [...preperedFeed];
+        const { postsData, feedData } = parsing(xmlString);
+        const feed = prepareFeed(feedData);
+        const post = preparePosts(postsData);
         feed.link = url;
         stateObserver.posts.push(...post);
         stateObserver.feeds.push(feed);
       })
       .catch((err) => {
-        errorsMapping[err.name](err);
-      })
-      .finally(() => {
-        stateObserver.status = 'waiting';
+        errorsMapping[err.name](err, 'failed');
       });
   };
 
